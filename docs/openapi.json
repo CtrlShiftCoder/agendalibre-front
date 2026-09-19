@@ -1,0 +1,2507 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AgendaLibre Mock API",
+    "version": "1.0.0",
+    "description": "In-memory Hono API for the Expo PoC. Request bodies derived from Zod schemas in src/modules/*/schemas.ts. No real payments / OAuth / FCM. See DICCIONARIO-DATOS.md."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8787"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "mock:<role>:<userId> or login token"
+      }
+    },
+    "schemas": {
+      "ApiSuccess": {
+        "type": "object",
+        "properties": {
+          "data": {},
+          "meta": {
+            "type": "object",
+            "properties": {
+              "requestId": {
+                "type": "string"
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Liveness",
+        "tags": [
+          "system"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "summary": "This OpenAPI document",
+        "tags": [
+          "system"
+        ],
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.0 JSON"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Mock login",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 4
+                  },
+                  "roleHint": {
+                    "type": "string",
+                    "enum": [
+                      "cliente",
+                      "empresa",
+                      "persona_natural"
+                    ]
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AuthSession"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "Mock register",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 4
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "cliente",
+                      "empresa",
+                      "persona_natural"
+                    ]
+                  },
+                  "niche": {
+                    "type": "string",
+                    "enum": [
+                      "barber",
+                      "health",
+                      "beauty",
+                      "other"
+                    ]
+                  },
+                  "phone": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password",
+                  "name",
+                  "role"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "AuthSession"
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Current user",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AuthUser"
+          }
+        }
+      }
+    },
+    "/services": {
+      "get": {
+        "summary": "List Service",
+        "tags": [
+          "service"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Service",
+        "tags": [
+          "service"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "durationMin": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "priceClp": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "depositPercent": {
+                    "type": "number",
+                    "nullable": true
+                  },
+                  "popular": {
+                    "type": "boolean"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "servicio",
+                      "paquete",
+                      "promo"
+                    ]
+                  },
+                  "iconKey": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "spa",
+                      "bolt",
+                      "all"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "durationMin",
+                  "priceClp"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Service"
+          }
+        }
+      }
+    },
+    "/services/{id}": {
+      "get": {
+        "summary": "Get Service",
+        "tags": [
+          "service"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update Service",
+        "tags": [
+          "service"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "durationMin": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "priceClp": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "depositPercent": {
+                    "type": "number",
+                    "nullable": true
+                  },
+                  "popular": {
+                    "type": "boolean"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "servicio",
+                      "paquete",
+                      "promo"
+                    ]
+                  },
+                  "iconKey": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "spa",
+                      "bolt",
+                      "all"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Service"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Service",
+        "tags": [
+          "service"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          }
+        }
+      }
+    },
+    "/professionals": {
+      "get": {
+        "summary": "List Professional",
+        "tags": [
+          "professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Professional[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Professional",
+        "tags": [
+          "professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "role": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "teamRole": {
+                    "type": "string",
+                    "enum": [
+                      "admin",
+                      "trabajador"
+                    ]
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "color": {
+                    "type": "string"
+                  },
+                  "workStart": {
+                    "type": "string"
+                  },
+                  "workEnd": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "role",
+                  "teamRole"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Professional"
+          }
+        }
+      }
+    },
+    "/professionals/{id}": {
+      "get": {
+        "summary": "Get Professional",
+        "tags": [
+          "professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Professional"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update Professional",
+        "tags": [
+          "professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "role": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "teamRole": {
+                    "type": "string",
+                    "enum": [
+                      "admin",
+                      "trabajador"
+                    ]
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "color": {
+                    "type": "string"
+                  },
+                  "workStart": {
+                    "type": "string"
+                  },
+                  "workEnd": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Professional"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Professional",
+        "tags": [
+          "professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          }
+        }
+      }
+    },
+    "/clients": {
+      "get": {
+        "summary": "List Client",
+        "tags": [
+          "client"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Client",
+        "tags": [
+          "client"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "phone": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "noShowCount": {
+                    "type": "integer"
+                  },
+                  "completedCount": {
+                    "type": "integer"
+                  },
+                  "lastVisitAt": {
+                    "type": "string"
+                  },
+                  "riskFlag": {
+                    "type": "string",
+                    "enum": [
+                      "ok",
+                      "watch",
+                      "high"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "phone"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Client"
+          }
+        }
+      }
+    },
+    "/clients/{id}": {
+      "get": {
+        "summary": "Get Client",
+        "tags": [
+          "client"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update Client",
+        "tags": [
+          "client"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "phone": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "noShowCount": {
+                    "type": "integer"
+                  },
+                  "completedCount": {
+                    "type": "integer"
+                  },
+                  "lastVisitAt": {
+                    "type": "string"
+                  },
+                  "riskFlag": {
+                    "type": "string",
+                    "enum": [
+                      "ok",
+                      "watch",
+                      "high"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Client"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Client",
+        "tags": [
+          "client"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          }
+        }
+      }
+    },
+    "/appointments": {
+      "get": {
+        "summary": "List Appointment",
+        "tags": [
+          "appointment"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appointment[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Appointment",
+        "tags": [
+          "appointment"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "serviceId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "professionalId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "clientId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "date": {
+                    "type": "string"
+                  },
+                  "startTime": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "confirmada",
+                      "pendiente",
+                      "cancelada",
+                      "completada",
+                      "noshow"
+                    ]
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "depositStatus": {
+                    "type": "string",
+                    "enum": [
+                      "not_required",
+                      "pending",
+                      "paid",
+                      "refunded",
+                      "forfeited"
+                    ]
+                  },
+                  "depositProvider": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "flow",
+                      "mercadopago"
+                    ]
+                  }
+                },
+                "required": [
+                  "serviceId",
+                  "professionalId",
+                  "clientId",
+                  "date",
+                  "startTime"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Appointment"
+          }
+        }
+      }
+    },
+    "/appointments/{id}": {
+      "get": {
+        "summary": "Get Appointment",
+        "tags": [
+          "appointment"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appointment"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update Appointment",
+        "tags": [
+          "appointment"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "serviceId": {
+                    "type": "string"
+                  },
+                  "professionalId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "clientId": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  },
+                  "startTime": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "confirmada",
+                      "pendiente",
+                      "cancelada",
+                      "completada",
+                      "noshow"
+                    ]
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "depositStatus": {
+                    "type": "string",
+                    "enum": [
+                      "not_required",
+                      "pending",
+                      "paid",
+                      "refunded",
+                      "forfeited"
+                    ]
+                  },
+                  "depositProvider": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "flow",
+                      "mercadopago"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Appointment"
+          }
+        }
+      }
+    },
+    "/businesses": {
+      "get": {
+        "summary": "List Business",
+        "tags": [
+          "business"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Business[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Business",
+        "tags": [
+          "business"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "niche": {
+                    "type": "string",
+                    "enum": [
+                      "barber",
+                      "health",
+                      "beauty",
+                      "other"
+                    ]
+                  },
+                  "roleKind": {
+                    "type": "string",
+                    "enum": [
+                      "empresa",
+                      "persona_natural"
+                    ]
+                  },
+                  "address": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "hours": {
+                    "type": "object",
+                    "properties": {
+                      "open": {
+                        "type": "string"
+                      },
+                      "close": {
+                        "type": "string"
+                      },
+                      "days": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 6
+                        }
+                      }
+                    },
+                    "required": [
+                      "open",
+                      "close",
+                      "days"
+                    ]
+                  },
+                  "blockedDates": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "theme": {
+                    "type": "string",
+                    "enum": [
+                      "barber",
+                      "health",
+                      "beauty",
+                      "neutral"
+                    ]
+                  },
+                  "slug": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "niche",
+                  "roleKind",
+                  "address"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Business"
+          }
+        }
+      }
+    },
+    "/businesses/{id}": {
+      "get": {
+        "summary": "Get Business",
+        "tags": [
+          "business"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Business"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update Business",
+        "tags": [
+          "business"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "niche": {
+                    "type": "string",
+                    "enum": [
+                      "barber",
+                      "health",
+                      "beauty",
+                      "other"
+                    ]
+                  },
+                  "roleKind": {
+                    "type": "string",
+                    "enum": [
+                      "empresa",
+                      "persona_natural"
+                    ]
+                  },
+                  "address": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "hours": {
+                    "type": "object",
+                    "properties": {
+                      "open": {
+                        "type": "string"
+                      },
+                      "close": {
+                        "type": "string"
+                      },
+                      "days": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 6
+                        }
+                      }
+                    },
+                    "required": [
+                      "open",
+                      "close",
+                      "days"
+                    ]
+                  },
+                  "blockedDates": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "theme": {
+                    "type": "string",
+                    "enum": [
+                      "barber",
+                      "health",
+                      "beauty",
+                      "neutral"
+                    ]
+                  },
+                  "slug": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business"
+          }
+        }
+      }
+    },
+    "/availability": {
+      "get": {
+        "summary": "List slots",
+        "tags": [
+          "availability"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "serviceId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "professionalId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AvailabilitySlot[]"
+          }
+        }
+      }
+    },
+    "/policies": {
+      "get": {
+        "summary": "Get cancellation policy",
+        "tags": [
+          "policies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CancellationPolicy"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update policy",
+        "tags": [
+          "policies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cancelBeforeHours": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "depositPercentDefault": {
+                    "type": "number",
+                    "nullable": true
+                  },
+                  "noShowFeePercent": {
+                    "type": "number",
+                    "nullable": true
+                  },
+                  "noShowFeeFixedClp": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "keepDepositOnNoShow": {
+                    "type": "boolean"
+                  },
+                  "policyText": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "CancellationPolicy"
+          }
+        }
+      }
+    },
+    "/waitlist": {
+      "get": {
+        "summary": "List waitlist",
+        "tags": [
+          "waitlist"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "WaitlistEntry[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Join waitlist",
+        "tags": [
+          "waitlist"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clientId": {
+                    "type": "string"
+                  },
+                  "clientName": {
+                    "type": "string"
+                  },
+                  "clientPhone": {
+                    "type": "string"
+                  },
+                  "serviceId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "professionalId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "preferredDate": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "preferredPeriod": {
+                    "type": "string",
+                    "enum": [
+                      "morning",
+                      "afternoon",
+                      "any"
+                    ]
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "clientId",
+                  "clientName",
+                  "clientPhone"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "WaitlistEntry"
+          }
+        }
+      }
+    },
+    "/waitlist/{id}": {
+      "patch": {
+        "summary": "Update waitlist entry",
+        "tags": [
+          "waitlist"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "waiting",
+                      "notified",
+                      "booked",
+                      "cancelled"
+                    ]
+                  },
+                  "preferredDate": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "preferredPeriod": {
+                    "type": "string",
+                    "enum": [
+                      "morning",
+                      "afternoon",
+                      "any"
+                    ]
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "serviceId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "professionalId": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "WaitlistEntry"
+          }
+        }
+      }
+    },
+    "/storefront": {
+      "get": {
+        "summary": "Get storefront",
+        "tags": [
+          "storefront"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PublicStorefront"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update storefront",
+        "tags": [
+          "storefront"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "displayName": {
+                    "type": "string"
+                  },
+                  "bio": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "coverEmoji": {
+                    "type": "string"
+                  },
+                  "coverColor": {
+                    "type": "string"
+                  },
+                  "showPrices": {
+                    "type": "boolean"
+                  },
+                  "showTeam": {
+                    "type": "boolean"
+                  },
+                  "slug": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PublicStorefront"
+          }
+        }
+      }
+    },
+    "/public/v/{slug}": {
+      "get": {
+        "summary": "Public vitrina",
+        "tags": [
+          "storefront"
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PublicStorefrontView"
+          }
+        }
+      }
+    },
+    "/cash/day": {
+      "get": {
+        "summary": "Day cash summary CLP",
+        "tags": [
+          "cash"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "professionalId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "DayCashSummary"
+          }
+        }
+      }
+    },
+    "/reminders/templates": {
+      "get": {
+        "summary": "List WhatsApp templates",
+        "tags": [
+          "reminders"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ReminderTemplate[]"
+          }
+        }
+      }
+    },
+    "/reminders/templates/{id}": {
+      "patch": {
+        "summary": "Update template",
+        "tags": [
+          "reminders"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "confirm",
+                      "reminder_24h",
+                      "reminder_2h",
+                      "noshow_followup"
+                    ]
+                  },
+                  "channel": {
+                    "type": "string",
+                    "enum": [
+                      "whatsapp",
+                      "sms",
+                      "email"
+                    ]
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ReminderTemplate"
+          }
+        }
+      }
+    },
+    "/reminders/jobs": {
+      "get": {
+        "summary": "List reminder jobs",
+        "tags": [
+          "reminders"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ReminderJob[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create + mock-send job",
+        "tags": [
+          "reminders"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "appointmentId": {
+                    "type": "string"
+                  },
+                  "templateId": {
+                    "type": "string"
+                  },
+                  "channel": {
+                    "type": "string",
+                    "enum": [
+                      "whatsapp",
+                      "sms",
+                      "email"
+                    ]
+                  },
+                  "scheduledFor": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "appointmentId",
+                  "templateId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "ReminderJob"
+          }
+        }
+      }
+    },
+    "/honorarios/quote": {
+      "post": {
+        "summary": "Chile boleta retention quote (2026 15.25%)",
+        "tags": [
+          "honorarios"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "brutoClp": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "year": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "brutoClp"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "HonorariosQuote"
+          }
+        }
+      }
+    },
+    "/team/invites": {
+      "get": {
+        "summary": "List invites",
+        "tags": [
+          "team"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "TeamInvite[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create invite",
+        "tags": [
+          "team"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "trabajador",
+                      "admin"
+                    ]
+                  },
+                  "businessName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "TeamInvite"
+          }
+        }
+      }
+    },
+    "/notifications": {
+      "get": {
+        "summary": "Inbox",
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AppNotification[]"
+          }
+        }
+      }
+    },
+    "/notifications/{id}/read": {
+      "patch": {
+        "summary": "Mark one read",
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AppNotification"
+          }
+        }
+      }
+    },
+    "/notifications/read-all": {
+      "post": {
+        "summary": "Mark all read",
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ updated }"
+          }
+        }
+      }
+    },
+    "/notifications/preferences": {
+      "get": {
+        "summary": "Push preferences",
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PushPreference"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update preferences",
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bookingConfirm": {
+                    "type": "boolean"
+                  },
+                  "reminder24h": {
+                    "type": "boolean"
+                  },
+                  "reminder2h": {
+                    "type": "boolean"
+                  },
+                  "waitlistOpen": {
+                    "type": "boolean"
+                  },
+                  "reviewRequest": {
+                    "type": "boolean"
+                  },
+                  "teamInvite": {
+                    "type": "boolean"
+                  },
+                  "marketing": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PushPreference"
+          }
+        }
+      }
+    },
+    "/reviews": {
+      "get": {
+        "summary": "List reviews",
+        "tags": [
+          "reviews"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Review[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create review",
+        "tags": [
+          "reviews"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "appointmentId": {
+                    "type": "string"
+                  },
+                  "clientId": {
+                    "type": "string"
+                  },
+                  "clientName": {
+                    "type": "string"
+                  },
+                  "professionalId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "serviceId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "rating": {
+                    "oneOf": [
+                      {
+                        "type": "number",
+                        "enum": [
+                          1
+                        ]
+                      },
+                      {
+                        "type": "number",
+                        "enum": [
+                          2
+                        ]
+                      },
+                      {
+                        "type": "number",
+                        "enum": [
+                          3
+                        ]
+                      },
+                      {
+                        "type": "number",
+                        "enum": [
+                          4
+                        ]
+                      },
+                      {
+                        "type": "number",
+                        "enum": [
+                          5
+                        ]
+                      }
+                    ]
+                  },
+                  "comment": {
+                    "type": "string"
+                  },
+                  "visible": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "appointmentId",
+                  "clientId",
+                  "clientName",
+                  "rating"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Review"
+          }
+        }
+      }
+    },
+    "/reviews/{id}": {
+      "patch": {
+        "summary": "Update review (reply / visibility)",
+        "tags": [
+          "reviews"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reply": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "visible": {
+                    "type": "boolean"
+                  },
+                  "rating": {
+                    "oneOf": [
+                      {
+                        "type": "number",
+                        "enum": [
+                          1
+                        ]
+                      },
+                      {
+                        "type": "number",
+                        "enum": [
+                          2
+                        ]
+                      },
+                      {
+                        "type": "number",
+                        "enum": [
+                          3
+                        ]
+                      },
+                      {
+                        "type": "number",
+                        "enum": [
+                          4
+                        ]
+                      },
+                      {
+                        "type": "number",
+                        "enum": [
+                          5
+                        ]
+                      }
+                    ]
+                  },
+                  "comment": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Review"
+          }
+        }
+      }
+    },
+    "/gallery": {
+      "get": {
+        "summary": "List gallery",
+        "tags": [
+          "gallery"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "GalleryItem[]"
+          }
+        }
+      },
+      "post": {
+        "summary": "Add gallery item",
+        "tags": [
+          "gallery"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "professionalId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "caption": {
+                    "type": "string"
+                  },
+                  "imageUri": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "placeholderColor": {
+                    "type": "string"
+                  },
+                  "emoji": {
+                    "type": "string"
+                  },
+                  "serviceId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "visible": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "GalleryItem"
+          }
+        }
+      }
+    },
+    "/gallery/{id}": {
+      "patch": {
+        "summary": "Update gallery item",
+        "tags": [
+          "gallery"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "professionalId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "caption": {
+                    "type": "string"
+                  },
+                  "imageUri": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "placeholderColor": {
+                    "type": "string"
+                  },
+                  "emoji": {
+                    "type": "string"
+                  },
+                  "serviceId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "visible": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "GalleryItem"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove gallery item",
+        "tags": [
+          "gallery"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "system"
+    },
+    {
+      "name": "auth"
+    },
+    {
+      "name": "storefront"
+    },
+    {
+      "name": "honorarios"
+    },
+    {
+      "name": "cash"
+    },
+    {
+      "name": "appointments"
+    },
+    {
+      "name": "services"
+    },
+    {
+      "name": "clients"
+    },
+    {
+      "name": "gallery"
+    },
+    {
+      "name": "reviews"
+    },
+    {
+      "name": "notifications"
+    },
+    {
+      "name": "reminders"
+    },
+    {
+      "name": "waitlist"
+    },
+    {
+      "name": "team"
+    },
+    {
+      "name": "policies"
+    }
+  ],
+  "x-generated-from": "zod-schemas"
+}
