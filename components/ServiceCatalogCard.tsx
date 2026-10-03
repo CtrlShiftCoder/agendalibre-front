@@ -261,7 +261,7 @@ function createStyles(c: AppColors) {
   },
   metaPrice: {
     fontSize: fontSize.sm,
-    fontFamily: fonts.bold,
+    fontFamily: fonts.labelBold,
     fontWeight: '700',
   },
   depositChip: {

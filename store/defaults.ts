@@ -48,7 +48,7 @@ export function defaultStorefront(profile: Profile): PublicStorefront {
           : profile.niche === 'beauty'
             ? '✨'
             : '📅',
-    coverColor: '#06C167',
+    coverColor: '#008378',
     showPrices: true,
     showTeam: profile.role === 'empresa',
     bookingPath: `/v/${slug}`,

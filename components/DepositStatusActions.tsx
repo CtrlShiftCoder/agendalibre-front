@@ -43,8 +43,8 @@ export function DepositStatusActions({
               style={[
                 styles.chip,
                 selected && {
-                  backgroundColor: colors.primaryText,
-                  borderColor: colors.primaryText,
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
                 },
               ]}
               accessibilityRole="radio"

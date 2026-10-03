@@ -1,26 +1,44 @@
-/** Flujo layout + Uber-friendly green brand tokens (default look) */
+/**
+ * Tokens del design system de Stitch "Soloist Modern" (proyecto Mobile Scheduling MVP UX,
+ * assets/fb61437a1cba42cea0cffe9596e40d81) — perfil profesional / persona natural.
+ * El nombre `flujo` se mantiene para no romper imports existentes.
+ * Fuente: namedColors de Stitch. Ajustes AA marcados con "AA".
+ */
 export const flujo = {
-  primary: '#059669',
-  primaryContainer: '#047857',
+  /** Stitch primary */
+  primary: '#00685F',
+  /** Stitch primary_container (texto blanco 4.65:1) */
+  primaryContainer: '#008378',
+  /** Mint wash de Stitch (chips/estado activo) */
   primaryFixed: '#D1FAE5',
   onPrimary: '#FFFFFF',
-  surface: '#F7FAF8',
-  onSurface: '#141414',
-  onSurfaceVariant: '#35453E',
+  /** Stitch surface */
+  surface: '#F8F9FF',
+  /** Stitch on_surface */
+  onSurface: '#0B1C30',
+  /** Stitch on_surface_variant */
+  onSurfaceVariant: '#3D4947',
   surfaceContainerLowest: '#FFFFFF',
-  surfaceContainerLow: '#F0FDF4',
-  surfaceContainer: '#ECFDF5',
-  surfaceContainerHigh: '#D1FAE5',
-  secondary: '#2F3D36',
-  secondaryContainer: '#E8F5EE',
+  /** Stitch surface_container_low */
+  surfaceContainerLow: '#EFF4FF',
+  /** Stitch surface_container */
+  surfaceContainer: '#E5EEFF',
+  /** Stitch surface_container_high */
+  surfaceContainerHigh: '#DCE9FF',
+  /** Stitch secondary */
+  secondary: '#565E74',
+  /** Stitch secondary_container */
+  secondaryContainer: '#DAE2FD',
+  /** Verde de éxito (Stitch status Confirmed text #065F46 / mint) — no es el tertiary ámbar de Stitch */
   tertiary: '#047857',
-  tertiaryContainer: '#059669',
+  tertiaryContainer: '#008378',
   tertiaryFixed: '#ECFDF5',
-  outline: '#5F7067',
-  /** Links / prices / labels on mint or white (AA small text; CTA fill stays primary) */
-  primaryText: '#047857',
-  /** Placeholder — AA on white/mint (≥4.5:1 body-size) */
-  placeholder: '#55665E',
+  /** Stitch outline #6D7A77 daba 4.47:1 → oscurecido a #5A6966 (AA 5.76:1 sobre blanco) */
+  outline: '#5A6966',
+  /** Links / precios / etiquetas sobre blanco o mint (AA 6.68:1) */
+  primaryText: '#00685F',
+  /** Placeholder — AA sobre blanco/surface (≥4.5:1) */
+  placeholder: '#566B67',
 } as const;
 
 export const baseColors = {
@@ -32,15 +50,15 @@ export const baseColors = {
   textMuted: flujo.onSurfaceVariant,
   border: flujo.outline,
   success: flujo.tertiary,
-  danger: '#B91C1C',
+  danger: '#BA1A1A',
   primary: flujo.primary,
   primaryText: flujo.primaryText,
   placeholder: flujo.placeholder,
-  charcoal: '#141414',
-  amber: '#B45309',
+  charcoal: '#0F172A',
+  amber: '#825100',
   rose: '#BE185D',
   softRose: '#FCE7F3',
-  overlay: 'rgba(20, 20, 20, 0.45)',
+  overlay: 'rgba(15, 23, 42, 0.45)',
   /** Flujo surfaces */
   surface: flujo.surface,
   onSurface: flujo.onSurface,
@@ -114,24 +132,24 @@ export const themes: Record<ThemeId, ThemeTokens> = {
     label: 'Barbería',
     primary: flujo.primary,
     primarySoft: flujo.primaryContainer,
-    accent: '#B45309',
+    accent: '#825100',
     onPrimary: '#FFFFFF',
     tabActive: flujo.primary,
     surfaceTint: flujo.primaryFixed,
-    gradient: [flujo.primary, '#00A878'],
-    heroGradient: ['#141414', '#3D4F46'],
+    gradient: [flujo.primary, flujo.primaryContainer],
+    heroGradient: ['#0F172A', '#213145'],
   },
   health: {
     id: 'health',
     label: 'Salud',
-    primary: '#059669',
-    primarySoft: '#06C167',
+    primary: flujo.primary,
+    primarySoft: flujo.primaryContainer,
     accent: '#047857',
     onPrimary: '#FFFFFF',
-    tabActive: '#059669',
+    tabActive: flujo.primary,
     surfaceTint: '#ECFDF5',
-    gradient: ['#059669', '#06C167'],
-    heroGradient: ['#047857', '#059669'],
+    gradient: [flujo.primary, flujo.primaryContainer],
+    heroGradient: ['#00403B', flujo.primary],
   },
   beauty: {
     id: 'beauty',
@@ -142,7 +160,7 @@ export const themes: Record<ThemeId, ThemeTokens> = {
     onPrimary: '#FFFFFF',
     tabActive: flujo.primary,
     surfaceTint: '#ECFDF5',
-    gradient: [flujo.primary, '#00A878'],
+    gradient: [flujo.primary, flujo.primaryContainer],
     heroGradient: [flujo.primary, '#F472B6'],
   },
 };
@@ -152,6 +170,10 @@ export const fonts = {
   medium: 'PlusJakartaSans_500Medium',
   semibold: 'PlusJakartaSans_600SemiBold',
   bold: 'PlusJakartaSans_700Bold',
+  /** Stitch label font (cifras CLP, etiquetas, chips) */
+  label: 'SpaceGrotesk_500Medium',
+  labelSemibold: 'SpaceGrotesk_600SemiBold',
+  labelBold: 'SpaceGrotesk_700Bold',
 } as const;
 
 export const spacing = {
@@ -164,13 +186,13 @@ export const spacing = {
   xxxl: 48,
 } as const;
 
-/** Flujo radii — md 16, cards ~24–32 */
+/** Stitch ROUND_EIGHT: DEFAULT 8 · md 12 · lg 16 · xl 24 · pills 9999 */
 export const radius = {
-  sm: 12,
-  md: 16,
-  lg: 24,
-  xl: 28,
-  xxl: 32,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 28,
   full: 999,
 } as const;
 
@@ -191,7 +213,7 @@ export const layout = {
 } as const;
 
 const shadowBase = {
-  shadowColor: '#141414',
+  shadowColor: '#0F172A',
 } as const;
 
 /** Prefer soft shadows (sm) for Flujo cards */
@@ -239,9 +261,9 @@ export const shadow = {
     shadowRadius: 14,
     elevation: 6,
   },
-  /** Selected day chip — soft primary glow rgba(6,193,103,0.35) */
+  /** Selected day chip — soft primary glow rgba(0,131,120,0.35) */
   primaryGlow: {
-    shadowColor: 'rgba(6, 193, 103, 1)',
+    shadowColor: 'rgba(0, 131, 120, 1)',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -262,36 +284,36 @@ export const shadow = {
 export type AppearanceMode = 'light' | 'dark';
 
 export const darkBase = {
-  cream: '#0F1412',
-  creamDeep: '#1A221E',
-  white: '#161C19',
-  text: '#F3F7F5',
-  textMuted: '#C5D0CA',
-  border: '#8A9B92',
-  success: '#34D399',
-  danger: '#F87171',
-  primary: '#059669',
-  primaryText: '#6EE7B7',
-  placeholder: '#AEBBB4',
-  charcoal: '#F3F7F5',
+  cream: '#0B1522',
+  creamDeep: '#1A2A42',
+  white: '#101C2D',
+  text: '#EAF1FF',
+  textMuted: '#B9C6D6',
+  border: '#8FA0A8',
+  success: '#4ADE80',
+  danger: '#FFB4AB',
+  primary: '#008378',
+  primaryText: '#6BD8CB',
+  placeholder: '#9AA9BA',
+  charcoal: '#EAF1FF',
   amber: '#FBBF24',
   rose: '#F9A8D4',
   softRose: '#3B1F2B',
   overlay: 'rgba(0, 0, 0, 0.55)',
-  surface: '#0F1412',
-  onSurface: '#F3F7F5',
-  onSurfaceVariant: '#C5D0CA',
-  surfaceContainerLowest: '#161C19',
-  surfaceContainerLow: '#1A221E',
-  surfaceContainer: '#1F2924',
-  surfaceContainerHigh: '#24302A',
-  primaryContainer: '#047857',
-  primaryFixed: '#064E3B',
-  secondary: '#C5D0CA',
-  secondaryContainer: '#24302A',
-  tertiary: '#34D399',
-  tertiaryFixed: '#064E3B',
-  outline: '#8A9B92',
+  surface: '#0B1522',
+  onSurface: '#EAF1FF',
+  onSurfaceVariant: '#B9C6D6',
+  surfaceContainerLowest: '#101C2D',
+  surfaceContainerLow: '#142238',
+  surfaceContainer: '#1A2A42',
+  surfaceContainerHigh: '#22344F',
+  primaryContainer: '#00685F',
+  primaryFixed: '#00403B',
+  secondary: '#B9C6D6',
+  secondaryContainer: '#22344F',
+  tertiary: '#4ADE80',
+  tertiaryFixed: '#00403B',
+  outline: '#8FA0A8',
 } as const;
 
 export function resolveBaseColors(appearance: AppearanceMode) {
@@ -301,25 +323,25 @@ export function resolveBaseColors(appearance: AppearanceMode) {
 
 /** Soft dark surfaces — WCAG AA for body text on surface (≥4.5:1) */
 export const softDark = {
-  primary: '#059669',
-  primaryContainer: '#047857',
-  primaryFixed: '#064E3B',
+  primary: '#008378',
+  primaryContainer: '#00685F',
+  primaryFixed: '#00403B',
   onPrimary: '#FFFFFF',
-  surface: '#121814',
-  onSurface: '#E8F0EB',
-  onSurfaceVariant: '#C5D0CA',
-  surfaceContainerLowest: '#1A211C',
-  surfaceContainerLow: '#1E2620',
-  surfaceContainer: '#242C26',
-  surfaceContainerHigh: '#2E3831',
-  secondary: '#C5D0CA',
-  secondaryContainer: '#2A3530',
-  tertiary: '#34D399',
-  tertiaryContainer: '#059669',
-  tertiaryFixed: '#064E3B',
-  outline: '#8A9B92',
-  primaryText: '#6EE7B7',
-  placeholder: '#AEBBB4',
+  surface: '#0B1522',
+  onSurface: '#EAF1FF',
+  onSurfaceVariant: '#B9C6D6',
+  surfaceContainerLowest: '#101C2D',
+  surfaceContainerLow: '#142238',
+  surfaceContainer: '#1A2A42',
+  surfaceContainerHigh: '#22344F',
+  secondary: '#B9C6D6',
+  secondaryContainer: '#22344F',
+  tertiary: '#4ADE80',
+  tertiaryContainer: '#008378',
+  tertiaryFixed: '#00403B',
+  outline: '#8FA0A8',
+  primaryText: '#6BD8CB',
+  placeholder: '#9AA9BA',
 } as const;
 
 export type ColorScheme = 'light' | 'dark';
@@ -367,7 +389,7 @@ export const darkColors: AppColors = {
   textMuted: softDark.onSurfaceVariant,
   border: softDark.outline,
   success: softDark.tertiary,
-  danger: '#F87171',
+  danger: '#FFB4AB',
   primary: softDark.primary,
   primaryText: softDark.primaryText,
   placeholder: softDark.placeholder,

@@ -1,5 +1,5 @@
 import { Stack, router } from 'expo-router';
-import { ArrowLeft, Calculator } from 'lucide-react-native';
+import { ArrowLeft, Calculator, FileText, MessageCircle, ShieldCheck } from 'lucide-react-native';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
@@ -27,7 +27,7 @@ import {
   quoteHonorarios,
   type HonorariosTipMode,
 } from '@/lib/honorarios';
-import { copyOrShare } from '@/lib/whatsapp';
+import { copyOrShare, openWhatsApp } from '@/lib/whatsapp';
 import { Alert } from '@/lib/Alert';
 import { parseClpInput } from '@/lib/money';
 import { apiQuoteHonorarios } from '@/store/apiActions';
@@ -140,13 +140,26 @@ export default function HonorariosScreen() {
                 <Calculator size={20} color="#fff" strokeWidth={2.4} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.title}>Honorarios Chile</Text>
+                <View style={styles.titleRow}>
+                  <Text style={styles.title}>Honorarios</Text>
+                  <View style={styles.roleChip}>
+                    <Text style={styles.roleChipText}>PERSONA NATURAL</Text>
+                  </View>
+                </View>
                 <Text style={styles.sub}>
                   Boleta 2026 · retención{' '}
                   {(HONORARIOS_RETENTION_2026 * 100).toFixed(2).replace('.', ',')}% ·
                   propina opcional
                 </Text>
               </View>
+            </View>
+
+            <View style={styles.banner} accessibilityRole="summary">
+              <ShieldCheck size={20} color={colors.primaryText} strokeWidth={2.4} />
+              <Text style={styles.bannerText}>
+                <Text style={styles.bannerStrong}>Régimen autónomo 100% directo: </Text>
+                calculamos la retención del SII por ti. Cobras directo a tu cuenta, sin comisiones de plataforma.
+              </Text>
             </View>
 
             <TextField
@@ -171,8 +184,8 @@ export default function HonorariosScreen() {
                     style={[
                       styles.chip,
                       selected && {
-                        backgroundColor: colors.primaryText,
-                        borderColor: colors.primaryText,
+                        backgroundColor: colors.primary,
+                        borderColor: colors.primary,
                       },
                     ]}
                     accessibilityRole="radio"
@@ -207,8 +220,8 @@ export default function HonorariosScreen() {
                     style={[
                       styles.chip,
                       selected && {
-                        backgroundColor: colors.primaryText,
-                        borderColor: colors.primaryText,
+                        backgroundColor: colors.primary,
+                        borderColor: colors.primary,
                       },
                     ]}
                     accessibilityRole="radio"
@@ -243,8 +256,8 @@ export default function HonorariosScreen() {
                       style={[
                         styles.chip,
                         selected && {
-                          backgroundColor: colors.primaryText,
-                          borderColor: colors.primaryText,
+                          backgroundColor: colors.primary,
+                          borderColor: colors.primary,
                         },
                       ]}
                       accessibilityRole="radio"
@@ -309,6 +322,14 @@ export default function HonorariosScreen() {
                   </Text>
                 </View>
               ) : null}
+              <View style={styles.netBox}>
+                <Text style={styles.netLabel}>LÍQUIDO A RECIBIR</Text>
+                <Text style={styles.netSub}>En tu cuenta bancaria personal</Text>
+                <Text style={styles.netValue}>
+                  {formatClp(quote.liquidoClp)}{' '}
+                  <Text style={styles.netUnit}>CLP NETO</Text>
+                </Text>
+              </View>
               <View style={[styles.row, styles.liquidoRow]}>
                 <Text style={styles.liquidoLabel}>Total cliente</Text>
                 <Text style={[styles.liquidoValue, { color: colors.primaryText }]}>
@@ -318,9 +339,9 @@ export default function HonorariosScreen() {
             </Card>
 
             <Card style={styles.boletaCard} elevated>
-              <Text style={styles.boletaTitle}>Boleta preview (SII-ready mock)</Text>
+              <Text style={styles.boletaTitle}>Vista previa de boleta electrónica</Text>
               <Text style={styles.boletaMock}>
-                Mock · sin envío al SII · sin folio real
+                SII e-Boleta · mock sin envío al SII ni folio real
               </Text>
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>RUT emisor</Text>
@@ -353,22 +374,41 @@ export default function HonorariosScreen() {
                   {formatClp(boleta.liquidoClp)}
                 </Text>
               </View>
-              <Button
-                title="Copiar / compartir boleta"
-                variant="secondary"
-                gradient={false}
-                style={{ marginTop: spacing.md }}
-                onPress={() => {
-                  void copyOrShare(formatBoletaShareText(boleta), 'Boleta mock').then(
-                    (how) => {
-                      Alert.alert(
-                        how === 'copied' ? 'Copiado' : 'Compartido',
-                        'Texto de boleta mock listo (sin SII).'
-                      );
-                    }
-                  );
-                }}
-              />
+              <View style={styles.actions}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Copiar texto de la boleta"
+                  style={[styles.actionBtn, styles.actionOutline]}
+                  onPress={() => {
+                    void copyOrShare(formatBoletaShareText(boleta), 'Boleta mock').then(
+                      (how) => {
+                        Alert.alert(
+                          how === 'copied' ? 'Copiado' : 'Compartido',
+                          'Texto de boleta mock listo (sin SII).'
+                        );
+                      }
+                    );
+                  }}
+                >
+                  <FileText size={18} color={colors.primaryText} strokeWidth={2.4} />
+                  <Text style={[styles.actionText, { color: colors.primaryText }]}>
+                    Copiar texto
+                  </Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Compartir boleta por WhatsApp"
+                  style={[styles.actionBtn, { backgroundColor: colors.primary }]}
+                  onPress={() => {
+                    void openWhatsApp(formatBoletaShareText(boleta));
+                  }}
+                >
+                  <MessageCircle size={18} color="#fff" strokeWidth={2.4} />
+                  <Text style={[styles.actionText, { color: '#fff' }]}>
+                    Compartir por WhatsApp
+                  </Text>
+                </Pressable>
+              </View>
             </Card>
 
             <Text style={styles.disclaimer}>
@@ -415,6 +455,77 @@ function createStyles(c: AppColors) {
       fontSize: 22,
       color: c.onSurface,
     },
+    titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
+    roleChip: {
+      backgroundColor: c.primaryFixed,
+      borderRadius: radius.full,
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+    },
+    roleChipText: {
+      fontFamily: fonts.labelSemibold,
+      fontSize: 10,
+      letterSpacing: 0.8,
+      color: c.primaryText,
+    },
+    banner: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      alignItems: 'flex-start',
+      backgroundColor: c.primaryFixed,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      marginBottom: spacing.lg,
+    },
+    bannerText: {
+      flex: 1,
+      fontFamily: fonts.medium,
+      fontSize: fontSize.sm,
+      lineHeight: 20,
+      color: c.onSurface,
+    },
+    bannerStrong: { fontFamily: fonts.bold, fontWeight: '700' },
+    netBox: {
+      marginTop: spacing.md,
+      borderWidth: 1.5,
+      borderColor: c.primaryText,
+      backgroundColor: c.primaryFixed,
+      borderRadius: radius.md,
+      padding: spacing.lg,
+    },
+    netLabel: {
+      fontFamily: fonts.labelSemibold,
+      fontSize: 11,
+      letterSpacing: 1.2,
+      color: c.primaryText,
+    },
+    netSub: {
+      fontFamily: fonts.medium,
+      fontSize: fontSize.xs,
+      color: c.onSurfaceVariant,
+      marginTop: 2,
+    },
+    netValue: {
+      fontFamily: fonts.labelBold,
+      fontWeight: '700',
+      fontSize: 30,
+      color: c.primaryText,
+      marginTop: 6,
+    },
+    netUnit: { fontFamily: fonts.labelSemibold, fontSize: 12, letterSpacing: 0.8 },
+    actions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
+    actionBtn: {
+      flex: 1,
+      minHeight: 48,
+      borderRadius: radius.md,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      paddingHorizontal: spacing.sm,
+    },
+    actionOutline: { borderWidth: 1.5, borderColor: c.primaryText },
+    actionText: { fontFamily: fonts.bold, fontWeight: '700', fontSize: fontSize.sm, textAlign: 'center' },
     sub: {
       marginTop: 2,
       fontFamily: fonts.medium,
@@ -473,7 +584,7 @@ function createStyles(c: AppColors) {
       paddingRight: spacing.sm,
     },
     rowValue: {
-      fontFamily: fonts.bold,
+      fontFamily: fonts.labelBold,
       fontWeight: '700',
       fontSize: fontSize.sm,
       color: c.onSurface,
@@ -491,7 +602,7 @@ function createStyles(c: AppColors) {
       color: c.onSurface,
     },
     liquidoValue: {
-      fontFamily: fonts.bold,
+      fontFamily: fonts.labelBold,
       fontWeight: '700',
       fontSize: 22,
     },

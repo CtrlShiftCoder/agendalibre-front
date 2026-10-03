@@ -1,5 +1,6 @@
 import { Stack, router } from 'expo-router';
-import { ArrowLeft, Wallet } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { ArrowLeft, ShieldCheck, Wallet } from 'lucide-react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
@@ -24,6 +25,7 @@ import {
 import { formatClp } from '@/lib/money';
 import { dayCashToCsv, exportCsv as shareOrDownloadCsv } from '@/lib/csv';
 import { hapticLight } from '@/lib/haptics';
+import { statusTone } from '@/lib/statusColors';
 import { apiCashDay } from '@/store/apiActions';
 import { useAppStore } from '@/store/useAppStore';
 import { useColors, useThemeTokens } from '@/store/useTheme';
@@ -35,6 +37,21 @@ import {
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
+}
+
+/** "viernes 2 oct 2026" — formato Stitch (Caja del día). */
+function formatDateLabel(isoDate: string) {
+  const d = new Date(isoDate + 'T12:00:00');
+  if (Number.isNaN(d.getTime())) return isoDate;
+  return d
+    .toLocaleDateString('es-CL', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
+    .replace(/\./g, '')
+    .replace(/,/g, '');
 }
 
 export default function CajaScreen() {
@@ -88,6 +105,25 @@ export default function CajaScreen() {
     const base = apiSummary ?? summary;
     return { ...base, byMethod: summary.byMethod };
   }, [apiSummary, summary]);
+
+  const pendingCount = Math.max(
+    0,
+    viewSummary.appointmentsCount -
+      viewSummary.completedCount -
+      viewSummary.cancelledCount -
+      viewSummary.noShowCount
+  );
+
+  const methodRows = useMemo(() => {
+    const m = viewSummary.byMethod;
+    if (!m) return [] as (readonly [string, number, string])[];
+    return [
+      ['Efectivo', m.cash, colors.primary],
+      ['Transferencia', m.transfer, colors.secondary],
+      ['Tarjeta', m.card, colors.amber],
+      ['Otro', m.other, colors.outline],
+    ] as const;
+  }, [viewSummary.byMethod, colors]);
 
   const completedRows = useMemo(() => {
     let list = appointments.filter(
@@ -183,9 +219,11 @@ export default function CajaScreen() {
                 <Text style={styles.sub}>
                   {ownOnly
                     ? 'Tu recaudación (trabajador)'
-                    : admin || profile.role === 'persona_natural'
-                      ? 'Resumen completo del día'
-                      : 'Resumen del día'}
+                    : profile.role === 'persona_natural'
+                      ? 'Cierre operativo y arqueo de ingresos'
+                      : admin
+                        ? 'Resumen completo del día'
+                        : 'Resumen del día'}
                 </Text>
               </View>
             </View>
@@ -194,7 +232,7 @@ export default function CajaScreen() {
               <Pressable onPress={() => shiftDate(-1)} style={styles.dateBtn}>
                 <Text style={styles.dateBtnText}>←</Text>
               </Pressable>
-              <Text style={styles.dateLabel}>{date}</Text>
+              <Text style={styles.dateLabel}>{formatDateLabel(date)}</Text>
               <Pressable onPress={() => shiftDate(1)} style={styles.dateBtn}>
                 <Text style={styles.dateBtnText}>→</Text>
               </Pressable>
@@ -206,38 +244,71 @@ export default function CajaScreen() {
               </Pressable>
             </View>
 
-            <Card style={styles.grossCard} elevated>
-              <Text style={styles.grossLabel}>Bruto completado</Text>
-              <Text style={[styles.grossValue, { color: colors.primaryText }]}>
+            <LinearGradient
+              colors={theme.gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.grossCard}
+            >
+              <Text style={styles.grossLabel}>BRUTO COMPLETADO</Text>
+              <Text style={styles.grossValue}>
                 {formatClp(viewSummary.grossClp)}
               </Text>
-              <Text style={styles.grossHint}>CLP · {viewSummary.completedCount} citas hechas</Text>
-            </Card>
-
-            <Button
-              title="Exportar CSV"
-              variant="secondary"
-              onPress={() => void exportCsv()}
-              style={{ marginBottom: spacing.md }}
-            />
+              <View style={styles.grossFooter}>
+                <View style={styles.grossBadge}>
+                  <Text style={styles.grossBadgeText}>
+                    {viewSummary.completedCount} citas hechas
+                  </Text>
+                </View>
+                {profile.role === 'persona_natural' ? (
+                  <Text style={styles.grossHint}>
+                    100% autónomo · sin comisión
+                  </Text>
+                ) : (
+                  <Text style={styles.grossHint}>CLP</Text>
+                )}
+              </View>
+            </LinearGradient>
 
             <View style={styles.metrics}>
-              {[
-                ['Citas', String(viewSummary.appointmentsCount)],
-                ['Hechas', String(viewSummary.completedCount)],
-                ['Cancel.', String(viewSummary.cancelledCount)],
-                ['No-show', String(viewSummary.noShowCount)],
-              ].map(([label, val]) => (
-                <View key={label} style={styles.metric}>
-                  <Text style={styles.metricVal}>{val}</Text>
-                  <Text style={styles.metricLabel}>{label}</Text>
-                </View>
-              ))}
+              {(
+                [
+                  ['Completadas', viewSummary.completedCount, 'completada'],
+                  ['Pendientes', pendingCount, 'pendiente'],
+                  ['Cancel.', viewSummary.cancelledCount, 'cancelada'],
+                  ['No-show', viewSummary.noShowCount, 'noshow'],
+                ] as const
+              ).map(([label, val, status]) => {
+                const tone = statusTone(status, colors);
+                return (
+                  <View
+                    key={label}
+                    style={[styles.metric, { backgroundColor: tone.bg }]}
+                  >
+                    <Text style={[styles.metricVal, { color: tone.fg }]}>
+                      {val}
+                    </Text>
+                    <Text style={[styles.metricLabel, { color: tone.fg }]}>
+                      {label}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
 
-            <Card style={styles.card} elevated>
-              <Text style={styles.sectionTitle}>Señas retenidas (est.)</Text>
-              <Text style={styles.rowValue}>{formatClp(viewSummary.depositsHeldClp)}</Text>
+            <Card style={styles.senaCard} elevated>
+              <View style={[styles.senaIcon, { backgroundColor: theme.surfaceTint }]}>
+                <ShieldCheck size={20} color={colors.primaryText} strokeWidth={2.4} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.sectionTitle}>Señas retenidas (est.)</Text>
+                <Text style={styles.sectionHint}>
+                  Garantía anti no-show: se descuenta del total al cobrar.
+                </Text>
+              </View>
+              <Text style={styles.senaValue}>
+                {formatClp(viewSummary.depositsHeldClp)}
+              </Text>
             </Card>
 
             {viewSummary.byMethod ? (
@@ -246,16 +317,22 @@ export default function CajaScreen() {
                 <Text style={styles.sectionHint}>
                   Marca el medio en cada cita completada (mapa local del día).
                 </Text>
-                {(
-                  [
-                    ['Efectivo', viewSummary.byMethod.cash],
-                    ['Transferencia', viewSummary.byMethod.transfer],
-                    ['Tarjeta', viewSummary.byMethod.card],
-                    ['Otro', viewSummary.byMethod.other],
-                  ] as const
-                ).map(([label, val]) => (
+                <View style={styles.methodBar}>
+                  {methodRows.map(([label, val, color]) =>
+                    val > 0 ? (
+                      <View
+                        key={label}
+                        style={{ flex: val, backgroundColor: color }}
+                      />
+                    ) : null
+                  )}
+                </View>
+                {methodRows.map(([label, val, color]) => (
                   <View key={label} style={styles.row}>
-                    <Text style={styles.rowLabel}>{label}</Text>
+                    <View style={styles.methodLabelRow}>
+                      <View style={[styles.methodDot, { backgroundColor: color }]} />
+                      <Text style={styles.rowLabel}>{label}</Text>
+                    </View>
                     <Text style={styles.rowValue}>{formatClp(val)}</Text>
                   </View>
                 ))}
@@ -295,8 +372,8 @@ export default function CajaScreen() {
                             style={[
                               styles.chip,
                               selected && {
-                                backgroundColor: colors.primaryText,
-                                borderColor: colors.primaryText,
+                                backgroundColor: colors.primary,
+                                borderColor: colors.primary,
                               },
                             ]}
                             accessibilityRole="radio"
@@ -339,6 +416,14 @@ export default function CajaScreen() {
                 })}
               </Card>
             ) : null}
+
+            <Button
+              title="Exportar CSV"
+              variant="secondary"
+              gradient={false}
+              onPress={() => void exportCsv()}
+              style={{ marginTop: spacing.sm }}
+            />
           </FadeInView>
         </ScrollView>
       </ResponsiveShell>
@@ -415,25 +500,79 @@ function createStyles(c: AppColors) {
     justifyContent: 'center',
   },
   todayText: { fontFamily: fonts.bold, fontWeight: '700', fontSize: fontSize.xs },
-  grossCard: { marginBottom: spacing.md, alignItems: 'flex-start' },
+  grossCard: {
+    marginBottom: spacing.md,
+    padding: spacing.xl,
+    borderRadius: radius.lg,
+    alignItems: 'flex-start',
+  },
   grossLabel: {
+    fontFamily: fonts.labelSemibold,
     fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 1,
-    color: c.onSurfaceVariant,
+    letterSpacing: 1.2,
+    color: '#FFFFFF',
+    opacity: 0.9,
   },
   grossValue: {
-    fontFamily: fonts.bold,
+    fontFamily: fonts.labelBold,
     fontWeight: '700',
-    fontSize: 32,
+    fontSize: 34,
     marginTop: 4,
+    color: '#FFFFFF',
+  },
+  grossFooter: {
+    marginTop: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  grossBadge: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: radius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  grossBadgeText: {
+    fontFamily: fonts.labelSemibold,
+    fontSize: 12,
+    color: '#FFFFFF',
   },
   grossHint: {
-    marginTop: 4,
     fontFamily: fonts.medium,
     fontSize: fontSize.sm,
-    color: c.onSurfaceVariant,
+    color: '#FFFFFF',
+    opacity: 0.92,
   },
+  senaCard: {
+    marginBottom: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  senaIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  senaValue: {
+    fontFamily: fonts.labelBold,
+    fontWeight: '700',
+    fontSize: fontSize.lg,
+    color: c.primaryText,
+  },
+  methodBar: {
+    flexDirection: 'row',
+    height: 10,
+    borderRadius: radius.full,
+    overflow: 'hidden',
+    backgroundColor: c.surfaceContainer,
+    marginBottom: spacing.sm,
+  },
+  methodLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  methodDot: { width: 10, height: 10, borderRadius: 5 },
   metrics: {
     flexDirection: 'row',
     gap: 8,
@@ -447,9 +586,9 @@ function createStyles(c: AppColors) {
     alignItems: 'center',
   },
   metricVal: {
-    fontFamily: fonts.bold,
+    fontFamily: fonts.labelBold,
     fontWeight: '700',
-    fontSize: 18,
+    fontSize: 20,
     color: c.onSurface,
   },
   metricLabel: {
@@ -486,7 +625,7 @@ function createStyles(c: AppColors) {
     color: c.onSurfaceVariant,
   },
   rowValue: {
-    fontFamily: fonts.bold,
+    fontFamily: fonts.labelBold,
     fontWeight: '700',
     fontSize: fontSize.sm,
     color: c.onSurface,
@@ -516,7 +655,7 @@ function createStyles(c: AppColors) {
     marginTop: 2,
   },
   aptPrice: {
-    fontFamily: fonts.bold,
+    fontFamily: fonts.labelBold,
     fontWeight: '700',
     fontSize: fontSize.sm,
     color: c.primaryText,

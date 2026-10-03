@@ -29,6 +29,7 @@ import { ListSkeleton, useListBoot } from '@/components/Skeleton';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
 import { Screen } from '@/components/Screen';
 import { ServiceCatalogCard } from '@/components/ServiceCatalogCard';
+import { ShareBookingCard } from '@/components/ShareBookingCard';
 import {
   resolveServiceCategory,
   serviceCategoryLabel,
@@ -142,6 +143,8 @@ export default function ServiciosScreen() {
   const insets = useSafeAreaInsets();
   const profile = useAppStore((s) => s.profile);
   const services = useAppStore((s) => s.services);
+  const storefront = useAppStore((s) => s.storefront);
+  const isSolo = profile.role === 'persona_natural';
   // dual-write via apiActions
 
   const [filter, setFilter] = useState<FilterId>('todos');
@@ -280,9 +283,13 @@ export default function ServiciosScreen() {
             <Store size={20} color={theme.primary} strokeWidth={2.2} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.bannerTitle}>Catálogo de Servicios</Text>
+            <Text style={styles.bannerTitle}>
+              {isSolo ? 'Mis servicios' : 'Catálogo de Servicios'}
+            </Text>
             <Text style={styles.bannerSub}>
-              {activeCount} servicios activos · Configuración de turnos
+              {isSolo
+                ? `${activeCount} activos · duración y precio en CLP`
+                : `${activeCount} servicios activos · Configuración de turnos`}
             </Text>
           </View>
           <Pressable
@@ -303,6 +310,21 @@ export default function ServiciosScreen() {
             />
           </Pressable>
         </View>
+
+        {isSolo ? (
+          <View style={{ marginBottom: spacing.md }}>
+            <ShareBookingCard
+              businessName={storefront.displayName || profile.name || 'Mi consulta'}
+              link={{
+                slug: storefront.slug,
+                bookingPath: storefront.bookingPath || `/v/${storefront.slug}`,
+                name: storefront.displayName || profile.name,
+              }}
+              subtitle="Tus clientes ven solo los servicios activos"
+              previewPath={storefront.bookingPath || `/v/${storefront.slug}`}
+            />
+          </View>
+        ) : null}
 
         {/* Category pills */}
         <ScrollView
