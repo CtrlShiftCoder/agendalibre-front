@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { router } from 'expo-router';
 import { ArrowLeft, Bell } from 'lucide-react-native';
 import React, { useMemo } from 'react';
@@ -33,7 +34,7 @@ export function ScreenHeader({ title, subtitle, back = true, actions = false, ri
     <View style={styles.row}>
       {back ? (
         <Pressable
-          onPress={() => (onBack ? onBack() : router.canGoBack() ? router.back() : router.replace('/'))}
+          onPress={() => (onBack ? onBack() : router.canGoBack() ? goBack() : router.replace('/'))}
           style={styles.back}
           accessibilityRole="button"
           accessibilityLabel="Volver"

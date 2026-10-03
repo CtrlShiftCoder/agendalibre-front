@@ -43,7 +43,7 @@ export default function Finanzas() {
   const commissionBase = mode === 'comision' ? Math.round(month * 0.5) : 0;
 
   const links = [
-    { t: 'Caja del día', d: 'Cierre diario, métodos de pago y CSV', to: '/caja', icon: <Receipt size={18} color={c.primaryText} /> },
+    { t: 'Caja del día', d: 'Ingresos del día, métodos de pago y CSV', to: '/caja', icon: <Receipt size={18} color={c.primaryText} /> },
     ...(role === 'persona_natural' ? [{ t: 'Honorarios', d: 'Boleta de honorarios: bruto, retención y líquido', to: '/honorarios', icon: <FileText size={18} color={c.primaryText} /> }] : []),
     { t: 'Seña y abonos', d: 'Configura y sigue anticipos', to: '/sena', icon: <PiggyBank size={18} color={c.primaryText} /> },
     { t: 'Mis servicios y precios', d: 'Catálogo con duración y precio en CLP', to: '/servicios', icon: <Shield size={18} color={c.primaryText} /> },

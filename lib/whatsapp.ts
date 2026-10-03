@@ -57,8 +57,27 @@ export function notifyClientMessage(opts: {
 
 /** Copy text to clipboard on web; Share elsewhere. */
 export async function copyOrShare(text: string, title = 'AgendaLibre'): Promise<'copied' | 'shared'> {
-  if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
+  if (Platform.OS === 'web') {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return 'copied';
+      }
+    } catch {
+      /* permiso denegado: usa el método clásico */
+    }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch {
+      /* sin portapapeles: igual damos feedback */
+    }
     return 'copied';
   }
   await Share.share({ message: text, title });

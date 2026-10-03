@@ -384,7 +384,7 @@ export default function AgendaScreen() {
                   serviceName={svc?.name ?? 'Servicio'}
                   professionalName={pro?.name ?? 'Primer disponible'}
                   status={a.status}
-                  onPress={() => router.push(`/ticket/${a.id}`)}
+                  onPress={() => router.push(`/cita/${a.id}`)}
                 />
               </StaggerItem>
             );

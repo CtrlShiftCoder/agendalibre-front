@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { Stack, router } from 'expo-router';
 import {
   ArrowLeft,
@@ -26,6 +27,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
+import { FormSection, ToggleRow } from '@/components/ui';
 import { Card } from '@/components/Card';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
 import { TextField } from '@/components/TextField';
@@ -42,7 +44,7 @@ import {
   apiCreateTeamInvite,
   apiUpdateTeamMember,
 } from '@/store/apiActions';
-import { useAppStore } from '@/store/useAppStore';
+import { useAppStore, usePref } from '@/store/useAppStore';
 import {useThemeTokens, useColors} from '@/store/useTheme';
 import {
   fontSize,
@@ -225,7 +227,7 @@ export default function EquipoScreen() {
         <Stack.Screen options={{ headerShown: false }} />
         <ResponsiveShell style={styles.shell}>
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => goBack()}
             style={styles.backRow}
             accessibilityLabel="Volver"
           >
@@ -254,7 +256,7 @@ export default function EquipoScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => goBack()}
             style={styles.backRow}
             accessibilityLabel="Volver"
           >
@@ -400,6 +402,17 @@ export default function EquipoScreen() {
 
                   {canManage ? (
                     <Pressable
+                      onPress={() => router.push(`/profesional/${m.id}` as never)}
+                      style={styles.editBtn}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Permisos y perfil de ${m.name}`}
+                    >
+                      <Text style={{ color: colors.primaryText, fontWeight: '700', fontSize: 12 }}>Permisos</Text>
+                    </Pressable>
+                  ) : null}
+
+                  {canManage ? (
+                    <Pressable
                       onPress={() => openEdit(m)}
                       style={styles.editBtn}
                       accessibilityLabel={`Editar a ${m.name}`}
@@ -429,6 +442,8 @@ export default function EquipoScreen() {
               </Card>
             );
           })}
+
+          <OcupacionRules />
 
           {canManage ? (
             <Button
@@ -955,3 +970,20 @@ function createStyles(c: AppColors) {
 });
 }
 
+
+
+/** Reglas de ocupación de espacios (Stitch 1b4aa026): toggles persistentes en el store. */
+function OcupacionRules() {
+  const [overlap, setOverlap] = usePref<boolean>('equipo.overlap', true);
+  const [auto, setAuto] = usePref<boolean>('equipo.autoSeat', true);
+  const [confirm, setConfirm] = usePref<boolean>('equipo.confirmSwap', false);
+  return (
+    <View style={{ marginTop: spacing.lg }}>
+      <FormSection title="Reglas de ocupación" hint="Cómo se asignan sillones y boxes entre el equipo.">
+        <ToggleRow title="Permitir superposición de espacios" description="Agenda servicios breves o limpiezas mientras el puesto se desocupa." value={overlap} onValueChange={setOverlap} />
+        <ToggleRow title="Asignación automática de puesto libre" description="Reparte a los clientes al puesto disponible más cercano." value={auto} onValueChange={setAuto} />
+        <ToggleRow title="Pedir confirmación al cambiar de puesto" description="Avisa al profesional antes de mover una cita." value={confirm} onValueChange={setConfirm} />
+      </FormSection>
+    </View>
+  );
+}

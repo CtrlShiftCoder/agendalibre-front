@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Copy, Landmark, MessageCircle, ReceiptText, X } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -99,7 +100,7 @@ export default function VerificarPago() {
       <Button title="Solicitar nuevo comprobante por WhatsApp" variant="secondary" gradient={false} icon={<MessageCircle size={18} color={c.primaryText} />}
         onPress={() => { void openWhatsApp('Hola, ¿puedes reenviar el comprobante de tu transferencia?', cli?.phone); toast('Solicitud enviada por WhatsApp'); }} />
       <View style={{ height: spacing.sm }} />
-      <DangerButton outline title="Rechazar transferencia / marcar pendiente" icon={<X size={18} color={c.danger} />} onPress={() => { toast('Transferencia marcada como pendiente', 'warn'); router.back(); }} />
+      <DangerButton outline title="Rechazar transferencia / marcar pendiente" icon={<X size={18} color={c.danger} />} onPress={() => { toast('Transferencia marcada como pendiente', 'warn'); goBack(); }} />
       <View style={{ height: spacing.lg }} />
       <InfoBanner text="Al confirmar, la cita se marcará como PAGADA y se sumará a las finanzas del día en caja y reportería." />
     </PageScaffold>

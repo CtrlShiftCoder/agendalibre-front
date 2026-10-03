@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Star } from 'lucide-react-native';
 import React, {useMemo, useState} from 'react';
@@ -85,7 +86,7 @@ export default function DejarResenaScreen() {
         <ResponsiveShell style={{ flex: 1, padding: spacing.xl }}>
           <Text style={styles.title}>Sin acceso</Text>
           <Text style={styles.sub}>Solo clientes pueden dejar reseñas.</Text>
-          <Button title="Volver" onPress={() => router.back()} style={{ marginTop: spacing.lg }} />
+          <Button title="Volver" onPress={() => goBack()} style={{ marginTop: spacing.lg }} />
         </ResponsiveShell>
       </View>
     );
@@ -104,7 +105,7 @@ export default function DejarResenaScreen() {
           <Text style={styles.sub}>
             Solo puedes reseñar tus citas completadas.
           </Text>
-          <Button title="Volver" onPress={() => router.back()} style={{ marginTop: spacing.lg }} />
+          <Button title="Volver" onPress={() => goBack()} style={{ marginTop: spacing.lg }} />
         </ResponsiveShell>
       </View>
     );
@@ -117,7 +118,7 @@ export default function DejarResenaScreen() {
         <ResponsiveShell style={{ flex: 1, padding: spacing.xl }}>
           <Text style={styles.title}>Ya dejaste tu reseña</Text>
           <Text style={styles.sub}>Gracias por tu feedback.</Text>
-          <Button title="Volver" onPress={() => router.back()} style={{ marginTop: spacing.lg }} />
+          <Button title="Volver" onPress={() => goBack()} style={{ marginTop: spacing.lg }} />
         </ResponsiveShell>
       </View>
     );
@@ -145,7 +146,7 @@ export default function DejarResenaScreen() {
             </View>
             <Button
               title="Listo"
-              onPress={() => router.back()}
+              onPress={() => goBack()}
               style={{ marginTop: spacing.lg }}
             />
           </FadeInView>
@@ -166,7 +167,7 @@ export default function DejarResenaScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <FadeInView>
-            <Pressable onPress={() => router.back()} style={styles.backRow}>
+            <Pressable onPress={() => goBack()} style={styles.backRow}>
               <ArrowLeft size={20} color={colors.onSurface} strokeWidth={2.4} />
               <Text style={styles.backText}>Volver</Text>
             </Pressable>

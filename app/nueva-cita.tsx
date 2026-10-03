@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
@@ -317,7 +318,7 @@ export default function NuevaCitaScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <ResponsiveShell forceMax style={{ flex: 1 }}>
       <View style={styles.topBar}>
-        <Pressable onPress={() => (step === 0 ? router.back() : setStep((s) => s - 1))}>
+        <Pressable onPress={() => (step === 0 ? goBack() : setStep((s) => s - 1))}>
           <Text style={[styles.back, { color: colors.primaryText }]}>
             {step === 0 ? 'Cerrar' : 'Atrás'}
           </Text>

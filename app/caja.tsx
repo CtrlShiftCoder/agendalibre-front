@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { Stack, router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, ShieldCheck, Wallet } from 'lucide-react-native';
@@ -24,6 +25,7 @@ import {
 } from '@/lib/cash';
 import { formatClp } from '@/lib/money';
 import { dayCashToCsv, exportCsv as shareOrDownloadCsv } from '@/lib/csv';
+import { toast } from '@/components/ui';
 import { hapticLight } from '@/lib/haptics';
 import { statusTone } from '@/lib/statusColors';
 import { apiCashDay } from '@/store/apiActions';
@@ -172,7 +174,8 @@ export default function CajaScreen() {
 
   const exportCsv = async () => {
     const csv = dayCashToCsv(viewSummary);
-    await shareOrDownloadCsv(`caja_${viewSummary.date}.csv`, csv);
+    const how = await shareOrDownloadCsv(`caja_${viewSummary.date}.csv`, csv);
+    toast(how === 'downloaded' ? 'CSV descargado' : how === 'copied' ? 'CSV copiado' : 'CSV compartido');
   };
 
   const shiftDate = (delta: number) => {
@@ -188,7 +191,7 @@ export default function CajaScreen() {
         <ResponsiveShell forceMax style={{ flex: 1, padding: spacing.xl }}>
           <Text style={styles.title}>Sin acceso</Text>
           <Text style={styles.sub}>La caja del día es solo para proveedores.</Text>
-          <Button title="Volver" onPress={() => router.back()} style={{ marginTop: spacing.lg }} />
+          <Button title="Volver" onPress={() => goBack()} style={{ marginTop: spacing.lg }} />
         </ResponsiveShell>
       </View>
     );
@@ -205,7 +208,7 @@ export default function CajaScreen() {
           ]}
         >
           <FadeInView>
-            <Pressable onPress={() => router.back()} style={styles.backRow}>
+            <Pressable onPress={() => goBack()} style={styles.backRow}>
               <ArrowLeft size={20} color={colors.onSurface} strokeWidth={2.4} />
               <Text style={styles.backText}>Volver</Text>
             </Pressable>

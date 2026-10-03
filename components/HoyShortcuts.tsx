@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import {
   Bell,
   CalendarPlus,
+  ClipboardCheck,
   Clock3,
   type LucideIcon,
   Wallet,
@@ -26,7 +27,7 @@ type Shortcut = {
   key: string;
   label: string;
   Icon: LucideIcon;
-  href: '/nueva-cita' | '/lista-espera' | '/caja' | '/notificaciones' | '/reservar';
+  href: '/nueva-cita' | '/lista-espera' | '/caja' | '/notificaciones' | '/reservar' | '/solicitudes' | '/disponibilidad';
 };
 
 /**
@@ -77,6 +78,7 @@ export function HoyShortcuts() {
         href: '/nueva-cita',
       },
     ];
+    out.push({ key: 'solicitudes', label: 'Solicitudes', Icon: ClipboardCheck, href: '/solicitudes' });
     if (isFeatureEnabled('listaEspera', ctx)) {
       out.push({
         key: 'lista-espera',

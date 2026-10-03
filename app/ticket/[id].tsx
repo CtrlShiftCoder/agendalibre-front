@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import {
   CalendarClock,
@@ -105,7 +106,7 @@ export default function TicketScreen() {
         <ResponsiveShell forceMax style={{ flex: 1, padding: spacing.xl }}>
           <View style={styles.center}>
             <Text style={styles.missing}>No encontramos esta cita</Text>
-            <Button title="Volver" onPress={() => router.back()} />
+            <Button title="Volver" onPress={() => goBack()} />
           </View>
         </ResponsiveShell>
       </SafeAreaView>
@@ -141,7 +142,7 @@ export default function TicketScreen() {
             });
             void openWhatsApp(msg, client?.phone);
           }}
-          onDone={() => router.back()}
+          onDone={() => goBack()}
         />
 
         <DepositInfoCard
@@ -287,7 +288,7 @@ export default function TicketScreen() {
                   setUndoCancelVisible(false);
                   setReviewToastVisible(true);
                 } else {
-                  router.back();
+                  goBack();
                 }
               }}
             />
@@ -318,7 +319,7 @@ export default function TicketScreen() {
                           code: appointment.code,
                           businessName: profile.name,
                         });
-                        router.back();
+                        goBack();
                       },
                     },
                   ]

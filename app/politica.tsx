@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { Stack, router } from 'expo-router';
 import { ArrowLeft, Shield } from 'lucide-react-native';
 import React, {useMemo, useState} from 'react';
@@ -100,7 +101,7 @@ export default function PoliticaScreen() {
         <ResponsiveShell style={{ flex: 1, padding: spacing.xl }}>
           <Text style={styles.title}>Sin acceso</Text>
           <Text style={styles.sub}>Esta pantalla no está disponible para tu perfil.</Text>
-          <Button title="Volver" onPress={() => router.back()} style={{ marginTop: spacing.lg }} />
+          <Button title="Volver" onPress={() => goBack()} style={{ marginTop: spacing.lg }} />
         </ResponsiveShell>
       </View>
     );
@@ -118,7 +119,7 @@ export default function PoliticaScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <FadeInView>
-            <Pressable onPress={() => router.back()} style={styles.backRow} accessibilityLabel="Volver">
+            <Pressable onPress={() => goBack()} style={styles.backRow} accessibilityLabel="Volver">
               <ArrowLeft size={20} color={colors.onSurface} strokeWidth={2.4} />
               <Text style={styles.backText}>Volver</Text>
             </Pressable>

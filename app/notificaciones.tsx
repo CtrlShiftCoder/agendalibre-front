@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { Stack, router } from 'expo-router';
 import { ArrowLeft, Bell, CheckCheck } from 'lucide-react-native';
 import React, { useMemo } from 'react';
@@ -77,7 +78,7 @@ export default function NotificacionesScreen() {
           ]}
         >
           <FadeInView>
-            <Pressable onPress={() => router.back()} style={styles.backRow}>
+            <Pressable onPress={() => goBack()} style={styles.backRow}>
               <ArrowLeft size={20} color={colors.onSurface} strokeWidth={2.4} />
               <Text style={styles.backText}>Volver</Text>
             </Pressable>

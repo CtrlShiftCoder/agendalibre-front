@@ -1,5 +1,8 @@
 import { router } from 'expo-router';
-import { Plus } from 'lucide-react-native';
+import { CalendarPlus, MessageCircle, Plus } from 'lucide-react-native';
+import { openWhatsApp } from '@/lib/whatsapp';
+import { StatCard, toast } from '@/components/ui';
+import { formatClp } from '@/lib/cash';
 import React, {useMemo, useState} from 'react';
 import {
   Alert,
@@ -62,6 +65,22 @@ export default function ClientesScreen() {
   const appointments = useAppStore((s) => s.appointments);
   const deleteClient = useAppStore((s) => s.deleteClient);
 
+  const services = useAppStore((s) => s.services);
+  const { recurrence, ticket } = useMemo(() => {
+    const counts = new Map<string, number>();
+    let sum = 0;
+    let n = 0;
+    for (const a of appointments) {
+      if (a.status === 'cancelada') continue;
+      counts.set(a.clientId, (counts.get(a.clientId) ?? 0) + 1);
+      if (a.status === 'completada') {
+        sum += services.find((x) => x.id === a.serviceId)?.priceClp ?? 0;
+        n += 1;
+      }
+    }
+    const rec = clients.length ? Math.round(([...counts.values()].filter((v) => v >= 2).length / clients.length) * 100) : 0;
+    return { recurrence: rec, ticket: n ? Math.round(sum / n) : 0 };
+  }, [appointments, services, clients]);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('+569');
@@ -128,6 +147,11 @@ export default function ClientesScreen() {
           <IconButton onPress={() => setOpen(true)} variant="solid" accessibilityLabel="Nuevo cliente">
             <Plus size={22} color="#fff" strokeWidth={2.5} />
           </IconButton>
+        </View>
+        <View style={styles.metrics}>
+          <StatCard label="Total" value={clients.length} tone="primary" />
+          <StatCard label="Recurrencia" value={`${recurrence}%`} hint="2+ visitas" />
+          <StatCard label="Ticket med." value={formatClp(ticket)} />
         </View>
         <Button
           title="Lista de espera"
@@ -293,6 +317,26 @@ export default function ClientesScreen() {
                       ) : null}
                     </View>
                   ) : null}
+                  <View style={styles.quick}>
+                    <Pressable
+                      onPress={() => { void openWhatsApp(`Hola ${c.name.split(' ')[0]}, te escribo desde mi agenda.`, c.phone); toast('Abriendo WhatsApp'); }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`WhatsApp a ${c.name}`}
+                      style={[styles.qBtn, { backgroundColor: colors.surfaceContainerLow }]}
+                    >
+                      <MessageCircle size={16} color={colors.primaryText} />
+                      <Text style={[styles.qTxt, { color: colors.primaryText }]}>WhatsApp</Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => router.push({ pathname: '/nueva-cita', params: { clientId: c.id } } as never)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Agendar a ${c.name}`}
+                      style={[styles.qBtn, { backgroundColor: theme.primary }]}
+                    >
+                      <CalendarPlus size={16} color="#fff" />
+                      <Text style={[styles.qTxt, { color: '#fff' }]}>Agendar</Text>
+                    </Pressable>
+                  </View>
                   <Pressable
                     onPress={() =>
                       Alert.alert('¿Eliminar cliente?', c.name, [
@@ -343,6 +387,10 @@ export default function ClientesScreen() {
 function createStyles(c: AppColors) {
   return StyleSheet.create({
   safe: { flex: 1, backgroundColor: c.cream },
+  metrics: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg },
+  quick: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
+  qBtn: { flex: 1, minHeight: 40, borderRadius: 12, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center' },
+  qTxt: { fontWeight: '700', fontSize: 13 },
   scroll: { padding: spacing.xl, paddingBottom: 100 },
   top: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.lg },
   title: { fontSize: 28, fontWeight: '800', color: c.text },

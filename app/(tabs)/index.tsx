@@ -1,3 +1,4 @@
+import { HoyProBlock } from '@/components/HoyProBlock';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { Bell, Plus, Search, SlidersHorizontal, Sun, Zap } from 'lucide-react-native';
@@ -520,6 +521,8 @@ function ProviderHoyScreen() {
           )}
         </Text>
 
+        <HoyProBlock />
+
         <HoyNextChip appointments={scopedAppointments} services={services} />
 
         <StatChips
@@ -580,6 +583,8 @@ function ProviderHoyScreen() {
           <Pressable
             style={styles.tuneBtn}
             accessibilityLabel="Ajustar vista"
+            accessibilityRole="button"
+            onPress={() => router.push('/agenda')}
             hitSlop={8}
           >
             <SlidersHorizontal
@@ -631,8 +636,8 @@ function ProviderHoyScreen() {
                   endsInMin={row.endsInMin}
                   status={a.status}
                   pending={a.status === 'pendiente'}
-                  onPress={() => router.push(`/ticket/${a.id}`)}
-                  onManage={() => router.push(`/ticket/${a.id}`)}
+                  onPress={() => router.push(`/cita/${a.id}`)}
+                  onManage={() => router.push(`/cita/${a.id}`)}
                   onRebook={() =>
                     router.push({
                       pathname: '/nueva-cita',

@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
@@ -663,7 +664,7 @@ export default function ReservarScreen() {
               title="Salir"
               variant="ghost"
               gradient={false}
-              onPress={() => router.back()}
+              onPress={() => goBack()}
               fullWidth={false}
               style={{ flex: 1 }}
             />

@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { Stack, router } from 'expo-router';
 import { ArrowLeft, Calculator, FileText, MessageCircle, ShieldCheck } from 'lucide-react-native';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -112,7 +113,7 @@ export default function HonorariosScreen() {
           <Text style={styles.sub}>
             Disponible solo para Persona natural (boleta de honorarios).
           </Text>
-          <Button title="Volver" onPress={() => router.back()} style={{ marginTop: spacing.lg }} />
+          <Button title="Volver" onPress={() => goBack()} style={{ marginTop: spacing.lg }} />
         </ResponsiveShell>
       </View>
     );
@@ -130,7 +131,7 @@ export default function HonorariosScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <FadeInView>
-            <Pressable onPress={() => router.back()} style={styles.backRow}>
+            <Pressable onPress={() => goBack()} style={styles.backRow}>
               <ArrowLeft size={20} color={colors.onSurface} strokeWidth={2.4} />
               <Text style={styles.backText}>Volver</Text>
             </Pressable>
@@ -331,7 +332,7 @@ export default function HonorariosScreen() {
                 </Text>
               </View>
               <View style={[styles.row, styles.liquidoRow]}>
-                <Text style={styles.liquidoLabel}>Total cliente</Text>
+                <Text style={styles.liquidoLabel}>Cliente te paga (líquido + propina)</Text>
                 <Text style={[styles.liquidoValue, { color: colors.primaryText }]}>
                   {formatClp(tipPart.totalClienteClp)}
                 </Text>

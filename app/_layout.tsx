@@ -1,3 +1,4 @@
+import '@/lib/alertWeb';
 import { ToastHost } from '@/components/ui/Toast';
 import {
   PlusJakartaSans_400Regular,

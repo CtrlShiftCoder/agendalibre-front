@@ -42,7 +42,7 @@ export default function NegocioScreen() {
   const rows: { icon: React.ReactNode; t: string; d: string; to: string; badge?: string }[] = [
     { icon: <Users size={18} color={c.primaryText} />, t: 'Equipo / profesionales', d: `${pros.filter((p) => p.active).length} activos · comisiones y accesos`, to: '/equipo' },
     { icon: <ClipboardList size={18} color={c.primaryText} />, t: 'Solicitudes de reserva', d: 'Aprobar, proponer horario o rechazar', to: '/solicitudes', badge: nowReq ? String(nowReq) : undefined },
-    { icon: <Wallet size={18} color={c.primaryText} />, t: 'Caja del día', d: 'Cierre, arqueo y exportación CSV', to: '/caja' },
+    { icon: <Wallet size={18} color={c.primaryText} />, t: 'Caja del día', d: 'Ingresos por método y exportación CSV', to: '/caja' },
     { icon: <ShieldCheck size={18} color={c.primaryText} />, t: 'Verificar transferencias', d: 'Revisa comprobantes y suma a la caja', to: '/verificar-pago' },
     { icon: <ScanLine size={18} color={c.primaryText} />, t: 'Enrolar profesional con QR', d: 'Escanea el pase del profesional', to: '/enrolar' },
     { icon: <Store size={18} color={c.primaryText} />, t: 'Vitrina pública', d: `agendalibre.cl/${storefront.slug}`, to: '/vitrina' },

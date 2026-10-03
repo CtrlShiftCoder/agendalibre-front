@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, User, X } from 'lucide-react-native';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -17,6 +18,8 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { EmptyState } from '@/components/EmptyState';
 import { FadeInView } from '@/components/motion';
+import { Avatar, toast } from '@/components/ui';
+import { openWhatsApp } from '@/lib/whatsapp';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
 import { TextField } from '@/components/TextField';
 import { formatLongDate } from '@/data/slots';
@@ -154,7 +157,7 @@ export default function ClienteFichaScreen() {
           </Text>
           <Button
             title="Volver"
-            onPress={() => router.back()}
+            onPress={() => goBack()}
             style={{ marginTop: spacing.lg }}
           />
         </ResponsiveShell>
@@ -183,17 +186,13 @@ export default function ClienteFichaScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <FadeInView>
-            <Pressable onPress={() => router.back()} style={styles.backRow}>
+            <Pressable onPress={() => goBack()} style={styles.backRow}>
               <ArrowLeft size={20} color={colors.onSurface} strokeWidth={2.4} />
               <Text style={styles.backText}>Volver</Text>
             </Pressable>
 
             <View style={styles.headerRow}>
-              <View
-                style={[styles.headerIcon, { backgroundColor: theme.primary }]}
-              >
-                <User size={20} color="#fff" strokeWidth={2.4} />
-              </View>
+              <Avatar name={client.name} size={52} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.title}>{client.name}</Text>
                 <Text style={styles.sub}>{client.phone}</Text>
@@ -229,6 +228,35 @@ export default function ClienteFichaScreen() {
                 <Text style={styles.statLabel}>Riesgo</Text>
               </View>
             </View>
+
+            {profile.role !== 'cliente' ? (
+              <View style={{ flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg, flexWrap: 'wrap' }}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="WhatsApp al cliente"
+                  onPress={() => { void openWhatsApp(`Hola ${client.name.split(' ')[0]}, te escribo desde mi agenda.`, client.phone); toast('Abriendo WhatsApp'); }}
+                  style={[styles.stat, { flexDirection: 'row', gap: 6, justifyContent: 'center', minHeight: 44 }]}
+                >
+                  <Text style={[styles.statLabel, { color: colors.primaryText, fontWeight: '700' }]}>WhatsApp</Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Agendar cita"
+                  onPress={() => router.push({ pathname: '/nueva-cita', params: { clientId: client.id } })}
+                  style={[styles.stat, { flexDirection: 'row', justifyContent: 'center', minHeight: 44, backgroundColor: theme.primary }]}
+                >
+                  <Text style={[styles.statLabel, { color: '#fff', fontWeight: '700' }]}>Agendar</Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Seña y abonos"
+                  onPress={() => router.push('/sena')}
+                  style={[styles.stat, { flexDirection: 'row', justifyContent: 'center', minHeight: 44 }]}
+                >
+                  <Text style={[styles.statLabel, { color: colors.primaryText, fontWeight: '700' }]}>Seña</Text>
+                </Pressable>
+              </View>
+            ) : null}
 
             {canEditStaff ? (
               <>
@@ -372,7 +400,7 @@ export default function ClienteFichaScreen() {
               visibleApts.map((a) => {
                 const svc = services.find((s) => s.id === a.serviceId);
                 return (
-                  <Card key={a.id} style={styles.aptCard} elevated>
+                  <Card key={a.id} style={styles.aptCard} elevated onPress={() => router.push(profile.role === 'cliente' ? `/ticket/${a.id}` : `/cita/${a.id}`)}>
                     <Text style={styles.aptTitle}>
                       {svc?.name ?? 'Servicio'} · {a.startTime}
                     </Text>

@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { router } from 'expo-router';
 import { Send } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -26,7 +27,7 @@ export default function PropuestaHorarios() {
   const [notify, setNotify] = useState(true);
 
   if (p.status === 'approved' && view === 'admin') return (
-    <PageScaffold><ConfirmationScreen title="¡Horario aprobado!" message="Los cupos quedaron activos en la agenda del salón y en el link del profesional." primaryLabel="Volver" onPrimary={() => router.back()} secondaryLabel="Reiniciar demo" onSecondary={() => setP({ ...p, status: 'none' })} /></PageScaffold>
+    <PageScaffold><ConfirmationScreen title="¡Horario aprobado!" message="Los cupos quedaron activos en la agenda del salón y en el link del profesional." primaryLabel="Volver" onPrimary={() => goBack()} secondaryLabel="Reiniciar demo" onSecondary={() => setP({ ...p, status: 'none' })} /></PageScaffold>
   );
 
   return (

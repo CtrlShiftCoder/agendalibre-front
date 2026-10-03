@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { router, useLocalSearchParams } from 'expo-router';
 import { UserMinus } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -82,7 +83,7 @@ export default function Desvincular() {
       <InfoBanner text="Al confirmar se enviará el acta de liquidación y traspaso por correo y WhatsApp." />
       <DangerButton title="Confirmar desvinculación y liberar puesto" icon={<UserMinus size={18} color="#fff" />} onPress={confirm} />
       <View style={{ height: spacing.sm }} />
-      <Button title="Cancelar y mantener en el equipo" variant="secondary" gradient={false} onPress={() => router.back()} />
+      <Button title="Cancelar y mantener en el equipo" variant="secondary" gradient={false} onPress={() => goBack()} />
     </PageScaffold>
   );
 }

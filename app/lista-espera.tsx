@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { Stack, router } from 'expo-router';
 import { ArrowLeft, ListOrdered } from 'lucide-react-native';
 import React, {useMemo, useState} from 'react';
@@ -165,7 +166,7 @@ export default function ListaEsperaScreen() {
         <Stack.Screen options={{ headerShown: false }} />
         <ResponsiveShell style={{ flex: 1, padding: spacing.xl }}>
           <Text style={styles.title}>Sin acceso</Text>
-          <Button title="Volver" onPress={() => router.back()} />
+          <Button title="Volver" onPress={() => goBack()} />
         </ResponsiveShell>
       </View>
     );
@@ -183,7 +184,7 @@ export default function ListaEsperaScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <FadeInView>
-            <Pressable onPress={() => router.back()} style={styles.backRow}>
+            <Pressable onPress={() => goBack()} style={styles.backRow}>
               <ArrowLeft size={20} color={colors.onSurface} strokeWidth={2.4} />
               <Text style={styles.backText}>Volver</Text>
             </Pressable>

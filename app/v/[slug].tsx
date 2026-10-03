@@ -1,3 +1,4 @@
+import { goBack } from '@/lib/nav';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, MapPin } from 'lucide-react-native';
 import React, {useEffect, useMemo, useState} from 'react';
@@ -134,7 +135,7 @@ export default function PublicStorefrontScreen() {
           ]}
         >
           <FadeInView>
-            <Pressable onPress={() => router.back()} style={styles.backRow}>
+            <Pressable onPress={() => goBack()} style={styles.backRow}>
               <ArrowLeft size={20} color={colors.onSurface} strokeWidth={2.4} />
               <Text style={styles.backText}>Volver</Text>
             </Pressable>

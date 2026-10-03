@@ -63,7 +63,7 @@ export function HoyNextChip({ appointments, services }: Props) {
 
   return (
     <Pressable
-      onPress={() => router.push(`/ticket/${next.appointmentId}`)}
+      onPress={() => router.push(`/cita/${next.appointmentId}`)}
       style={[
         styles.chip,
         shadow.sm,
