@@ -1,3 +1,4 @@
+import { toast } from '@/components/ui/Toast';
 import { goBack } from '@/lib/nav';
 import { Stack, router } from 'expo-router';
 import {
@@ -99,6 +100,7 @@ export default function EquipoScreen() {
   const copyInviteCode = async (code: string) => {
     await copyOrShare(code, 'Código de invitación');
     setCopiedToast(true);
+    toast('Código copiado');
   };
 
   const generateInvite = async () => {

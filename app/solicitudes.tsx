@@ -27,7 +27,7 @@ export default function SolicitudesScreen() {
   const [auto, setAuto] = usePref<boolean>('sol.auto', false);
   const [tab, setTab] = useState('pend');
 
-  useEffect(() => { seed(); }, [seed]);
+  useEffect(() => { seed(); }, [seed, appointments]);
 
   const rows = useMemo(() => {
     const byId = (id: string) => appointments.find((a) => a.id === id);

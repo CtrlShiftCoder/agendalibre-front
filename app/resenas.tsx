@@ -1,3 +1,4 @@
+import { toast } from '@/components/ui/Toast';
 import { goBack } from '@/lib/nav';
 import { Stack, router } from 'expo-router';
 import { ArrowLeft, MessageSquare, Star } from 'lucide-react-native';
@@ -80,7 +81,8 @@ export default function ResenasScreen() {
   }
 
   const saveReply = () => {
-    if (!replyId || !draft.trim()) return;
+    if (!replyId) return;
+    if (!draft.trim()) { toast('Escribe una respuesta primero', 'warn'); return; }
     void apiReplyReview(replyId, draft.trim());
     setReplyId(null);
     setDraft('');

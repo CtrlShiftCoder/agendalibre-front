@@ -121,9 +121,9 @@ export default function ClienteFichaScreen() {
 
   const addTag = (raw: string) => {
     const t = normalizeTag(raw);
-    if (!t) return;
+    if (!t) { toast('Escribe una etiqueta', 'warn'); return; }
     const exists = tags.some((x) => x.toLowerCase() === t.toLowerCase());
-    if (exists) return;
+    if (exists) { toast('Esa etiqueta ya existe', 'warn'); return; }
     setTags((prev) => [...prev, t]);
   };
 

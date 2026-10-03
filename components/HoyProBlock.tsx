@@ -21,6 +21,8 @@ export function HoyProBlock() {
   const c = useColors();
   const admin = usePaletteId() === 'indigo';
   const apts = useAppStore((s) => s.appointments);
+  const seed = useAppStore((s) => s.seedMockRequests);
+  React.useEffect(() => { seed(); }, [seed, apts]);
   const services = useAppStore((s) => s.services);
   const pros = useAppStore((s) => s.professionals);
   const storefront = useAppStore((s) => s.storefront);

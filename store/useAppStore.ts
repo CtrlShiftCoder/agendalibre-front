@@ -405,14 +405,15 @@ export const useAppStore = create<AppState>()(
       setPref: (key, value) => set((s) => ({ prefs: { ...s.prefs, [key]: value } })),
       seedMockRequests: () =>
         set((s) => {
-          if (s.prefs?.requestsSeeded) return {};
+          const acted = ((s.prefs?.['sol.approved'] as string[] | undefined)?.length ?? 0) + ((s.prefs?.['sol.rejected'] as string[] | undefined)?.length ?? 0);
+          if (acted > 0 || s.appointments.some((a) => a.status === 'pendiente')) return {};
           if (!s.clients.length || !s.services.length) return {};
           const base = new Date();
           const mk = (n: number, hh: string, ci: number, si: number): Appointment => {
             const d = new Date(base.getTime() + n * 86400000);
             const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             return {
-              id: generateId('apt'),
+              id: `mock_${generateId('apt')}`,
               serviceId: s.services[si % s.services.length].id,
               professionalId: s.profile.activeProfessionalId ?? s.professionals[0]?.id ?? null,
               clientId: s.clients[ci % s.clients.length].id,
@@ -426,7 +427,6 @@ export const useAppStore = create<AppState>()(
           };
           return {
             appointments: [...s.appointments, mk(2, '15:00', 0, 0), mk(3, '11:00', 1, 1), mk(4, '17:30', 2, 0)],
-            prefs: { ...s.prefs, requestsSeeded: true },
           };
         }),
 

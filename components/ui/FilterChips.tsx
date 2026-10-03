@@ -19,7 +19,7 @@ export function FilterChips({ chips, value, onChange }: Props) {
             key={ch.id}
             onPress={() => onChange(ch.id)}
             accessibilityRole="radio"
-            accessibilityState={{ selected: on }}
+            accessibilityState={{ selected: on, checked: on }}
             style={[styles.chip, { backgroundColor: on ? c.primary : c.surfaceContainerLow }]}
           >
             <Text style={[styles.txt, { color: on ? '#fff' : c.onSurfaceVariant }]}>

@@ -1,3 +1,4 @@
+import { toast } from '@/components/ui/Toast';
 import { router } from 'expo-router';
 import {
   Copy,
@@ -67,6 +68,7 @@ export function ShareBookingCard({
   const copyLink = async () => {
     await copyOrShare(shareUrl, 'Link de reserva');
     setCopiedToast(true);
+    toast('Link copiado');
   };
 
   const shareWhatsApp = () => {

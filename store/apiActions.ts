@@ -34,6 +34,7 @@ import type {
   Review,
   WaitlistEntry,
 } from '@/contracts';
+import { getApiToken } from '@/api/session';
 import { isApiModeEnabled } from '@/lib/apiMode';
 import { useAppStore } from '@/store/useAppStore';
 import { clearBusinessCollections, hydrateFromApi } from '@/store/syncFromApi';
@@ -187,7 +188,7 @@ export async function apiUpdateAppointmentStatus(
   status: Appointment['status']
 ) {
   useAppStore.getState().updateAppointmentStatus(id, status);
-  if (!isApiModeEnabled()) return;
+  if (!isApiModeEnabled() || id.startsWith('mock_')) return;
   try {
     await appointmentsApi.update(id, { status });
   } catch (e) {
@@ -260,7 +261,7 @@ export async function apiQuoteHonorarios(brutoClp: number): Promise<HonorariosQu
 }
 
 export async function apiCashDay(date: string, professionalId?: string | null) {
-  if (!isApiModeEnabled()) return null;
+  if (!isApiModeEnabled() || !getApiToken()) return null;
   try {
     const res = await cashApi.day({
       date,

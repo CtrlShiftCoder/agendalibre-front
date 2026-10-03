@@ -1,3 +1,4 @@
+import { toast } from '@/components/ui/Toast';
 import { goBack } from '@/lib/nav';
 import { Stack, router } from 'expo-router';
 import { ArrowLeft, Bell, CheckCheck } from 'lucide-react-native';
@@ -101,7 +102,7 @@ export default function NotificacionesScreen() {
               title="Activar avisos del dispositivo"
               variant="secondary"
               onPress={() => {
-                void requestPermissions();
+                void requestPermissions().then((ok) => toast(ok ? 'Avisos activados' : 'Permiso no disponible en este dispositivo/navegador', ok ? 'ok' : 'warn'));
               }}
               style={{ marginBottom: spacing.md }}
             />

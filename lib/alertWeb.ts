@@ -1,4 +1,4 @@
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, Share } from 'react-native';
 
 import { toast } from '@/components/ui/Toast';
 
@@ -20,5 +20,24 @@ if (Platform.OS === 'web') {
     const ok = typeof window !== 'undefined' && typeof window.confirm === 'function' ? window.confirm(text) : false;
     if (ok) action?.onPress?.();
     else cancel?.onPress?.();
+  };
+}
+
+if (Platform.OS === 'web') {
+  /** react-native-web lanza "Share is not supported" si el navegador no tiene Web Share: copiamos al portapapeles. */
+  const nativeShare = Share.share.bind(Share);
+  Share.share = async (content, options) => {
+    try {
+      return await nativeShare(content, options);
+    } catch {
+      const text = (content as { message?: string }).message ?? '';
+      try {
+        await navigator.clipboard?.writeText(text);
+      } catch {
+        /* sin portapapeles */
+      }
+      toast('Copiado para compartir');
+      return { action: Share.sharedAction } as never;
+    }
   };
 }
