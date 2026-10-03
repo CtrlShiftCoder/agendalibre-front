@@ -135,6 +135,8 @@ interface AppState {
   /** Preferencias/ajustes mock persistentes (toggles, permisos, propuestas…). */
   prefs: Record<string, unknown>;
   setPref: (key: string, value: unknown) => void;
+  /** Demo: crea 3 solicitudes de reserva pendientes (una sola vez). */
+  seedMockRequests: () => void;
 
   setHydrated: (v: boolean) => void;
   setAppearance: (mode: AppearanceMode) => void;
@@ -401,6 +403,32 @@ export const useAppStore = create<AppState>()(
       depositStatuses: {},
       prefs: {},
       setPref: (key, value) => set((s) => ({ prefs: { ...s.prefs, [key]: value } })),
+      seedMockRequests: () =>
+        set((s) => {
+          if (s.prefs?.requestsSeeded) return {};
+          if (!s.clients.length || !s.services.length) return {};
+          const base = new Date();
+          const mk = (n: number, hh: string, ci: number, si: number): Appointment => {
+            const d = new Date(base.getTime() + n * 86400000);
+            const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            return {
+              id: generateId('apt'),
+              serviceId: s.services[si % s.services.length].id,
+              professionalId: s.profile.activeProfessionalId ?? s.professionals[0]?.id ?? null,
+              clientId: s.clients[ci % s.clients.length].id,
+              date: iso,
+              startTime: hh,
+              status: 'pendiente',
+              code: generateCode(),
+              createdAt: new Date().toISOString(),
+              notes: ci === 0 ? 'Si es posible con toalla caliente por favor' : undefined,
+            };
+          };
+          return {
+            appointments: [...s.appointments, mk(2, '15:00', 0, 0), mk(3, '11:00', 1, 1), mk(4, '17:30', 2, 0)],
+            prefs: { ...s.prefs, requestsSeeded: true },
+          };
+        }),
 
       setHydrated: (v) => set({ hydrated: v }),
 
