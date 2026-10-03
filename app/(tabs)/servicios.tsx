@@ -42,7 +42,6 @@ import { useColorScheme, useColors, useThemeTokens } from '@/store/useTheme';
 import {
   fontSize,
   fonts,
-  flujo,
   radius,
   shadow,
   spacing,
@@ -276,7 +275,7 @@ export default function ServiciosScreen() {
           <View
             style={[
               styles.bannerBlob,
-              { backgroundColor: flujo.primaryFixed },
+              { backgroundColor: colors.primaryFixed },
             ]}
           />
           <View style={[styles.bannerIcon, { backgroundColor: theme.primary + '18' }]}>
@@ -543,7 +542,7 @@ export default function ServiciosScreen() {
                   onValueChange={setActive}
                   trackColor={{
                     false: colors.surfaceContainerHigh,
-                    true: flujo.tertiaryContainer,
+                    true: colors.accent,
                   }}
                   thumbColor="#fff"
                   ios_backgroundColor={colors.surfaceContainerHigh}

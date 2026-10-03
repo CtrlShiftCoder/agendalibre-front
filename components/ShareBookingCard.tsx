@@ -22,7 +22,6 @@ import { useColors, useThemeTokens } from '@/store/useTheme';
 import {
   fontSize,
   fonts,
-  flujo,
   radius,
   shadow,
   spacing,
@@ -236,7 +235,7 @@ function createStyles(c: AppColors) {
       alignItems: 'center',
       justifyContent: 'center',
       gap: 8,
-      backgroundColor: flujo.tertiary,
+      backgroundColor: c.tertiary,
       borderRadius: radius.full,
       minHeight: 48,
       paddingHorizontal: spacing.lg,

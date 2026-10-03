@@ -25,7 +25,6 @@ import {useThemeTokens, useColors} from '@/store/useTheme';
 import {
   fontSize,
   fonts,
-  flujo,
   radius,
   shadow,
   spacing,
@@ -108,7 +107,7 @@ export function ServiceCatalogCard({
             }}
             trackColor={{
               false: colors.surfaceContainerHigh,
-              true: flujo.tertiaryContainer,
+              true: colors.accent,
             }}
             thumbColor={
               Platform.OS === 'android'
@@ -142,8 +141,8 @@ export function ServiceCatalogCard({
           </>
         ) : (
           <>
-            <Check size={13} color={flujo.tertiary} strokeWidth={2.6} />
-            <Text style={[styles.depositText, { color: flujo.tertiary }]}>
+            <Check size={13} color={colors.tertiary} strokeWidth={2.6} />
+            <Text style={[styles.depositText, { color: colors.tertiary }]}>
               Sin anticipo obligatorio
             </Text>
           </>
@@ -157,7 +156,7 @@ export function ServiceCatalogCard({
               styles.dot,
               {
                 backgroundColor: service.active
-                  ? flujo.tertiary
+                  ? colors.tertiary
                   : colors.outline,
               },
             ]}
@@ -167,7 +166,7 @@ export function ServiceCatalogCard({
               styles.visibleText,
               {
                 color: service.active
-                  ? flujo.tertiary
+                  ? colors.tertiary
                   : colors.onSurfaceVariant,
               },
             ]}

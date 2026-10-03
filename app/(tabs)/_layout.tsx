@@ -5,7 +5,9 @@ import {
   CalendarPlus,
   Home,
   Scissors,
+  Store,
   Sun,
+  Wallet,
   UserRound,
   Users,
 } from 'lucide-react-native';
@@ -15,8 +17,8 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { isProviderRole } from '@/data/types';
 import { formatUnreadBadge, unreadInboxCount } from '@/lib/reviews';
 import { useAppStore } from '@/store/useAppStore';
-import { useColorScheme, useColors, useThemeTokens } from '@/store/useTheme';
-import { fonts, flujo, type AppColors } from '@/theme/colors';
+import { useColorScheme, useColors, usePaletteId, useThemeTokens } from '@/store/useTheme';
+import { fonts, type AppColors } from '@/theme/colors';
 
 function TabBarBackground() {
   const colors = useColors();
@@ -55,7 +57,9 @@ export default function TabLayout() {
   const notifications = useAppStore((s) => s.notifications);
   const role = profile.role;
   const provider = isProviderRole(role);
-  const active = theme.tabActive || flujo.primary;
+  const isAdminNav = usePaletteId() === 'indigo';
+  const isSoloNav = provider && !isAdminNav;
+  const active = colors.primaryText;
   const hoyBadge = useMemo(
     () =>
       formatUnreadBadge(
@@ -70,7 +74,7 @@ export default function TabLayout() {
         headerShown: false,
         animation: 'fade',
         tabBarActiveTintColor: active,
-        tabBarInactiveTintColor: colors.secondary,
+        tabBarInactiveTintColor: colors.onSurfaceVariant,
         tabBarBackground: () => <TabBarBackground />,
         tabBarStyle: {
           position: 'absolute',
@@ -98,7 +102,7 @@ export default function TabLayout() {
           tabBarAccessibilityLabel: provider ? 'Hoy' : 'Inicio',
           tabBarBadge: hoyBadge,
           tabBarBadgeStyle: {
-            backgroundColor: active,
+            backgroundColor: theme.primary,
             color: '#fff',
             fontSize: 10,
             fontWeight: '700',
@@ -129,8 +133,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="agenda"
         options={{
-          title: 'Agenda',
-          tabBarAccessibilityLabel: 'Agenda',
+          title: isAdminNav ? 'Calendario' : 'Agenda',
+          tabBarAccessibilityLabel: isAdminNav ? 'Calendario' : 'Agenda',
           href: provider ? undefined : null,
           tabBarIcon: ({ color, size }) => (
             <CalendarDays size={size ?? 22} color={color} strokeWidth={2.2} />
@@ -142,7 +146,7 @@ export default function TabLayout() {
         options={{
           title: 'Servicios',
           tabBarAccessibilityLabel: 'Servicios',
-          href: provider ? undefined : null,
+          href: isAdminNav ? undefined : null,
           tabBarIcon: ({ color, size }) => (
             <Scissors size={size ?? 22} color={color} strokeWidth={2.2} />
           ),
@@ -160,13 +164,27 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="finanzas"
+        options={{
+          title: 'Finanzas',
+          tabBarAccessibilityLabel: 'Finanzas',
+          href: isSoloNav ? undefined : null,
+          tabBarIcon: ({ color, size }) => (
+            <Wallet size={size ?? 22} color={color} strokeWidth={2.2} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="perfil"
         options={{
-          title: 'Perfil',
-          tabBarAccessibilityLabel: 'Perfil',
-          tabBarIcon: ({ color, size }) => (
-            <UserRound size={size ?? 22} color={color} strokeWidth={2.2} />
-          ),
+          title: isAdminNav ? 'Negocio' : 'Perfil',
+          tabBarAccessibilityLabel: isAdminNav ? 'Negocio' : 'Perfil',
+          tabBarIcon: ({ color, size }) =>
+            isAdminNav ? (
+              <Store size={size ?? 22} color={color} strokeWidth={2.2} />
+            ) : (
+              <UserRound size={size ?? 22} color={color} strokeWidth={2.2} />
+            ),
         }}
       />
     </Tabs>
@@ -174,14 +192,8 @@ export default function TabLayout() {
 }
 
 function createStyles(c: AppColors, scheme: 'light' | 'dark') {
-  const barBg =
-    scheme === 'dark'
-      ? 'rgba(18, 24, 20, 0.92)'
-      : 'rgba(247, 250, 248, 0.94)';
-  const blurBg =
-    scheme === 'dark'
-      ? 'rgba(18, 24, 20, 0.72)'
-      : 'rgba(247, 250, 248, 0.72)';
+  const barBg = c.surface + 'EE';
+  const blurBg = c.surface + 'B8';
   return StyleSheet.create({
     webBar: {
       backgroundColor: barBg,

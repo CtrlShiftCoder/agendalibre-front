@@ -377,9 +377,24 @@ export type AppColors = {
   tertiary: string;
   tertiaryFixed: string;
   outline: string;
+  /** Hero / tarjeta destacada [heroFrom → heroTo] */
+  heroFrom: string;
+  heroTo: string;
+  /** Acento vibrante (gráficos, insignias) */
+  accent: string;
+  accentSoft: string;
+  /** Texto sobre accent (AA) */
+  onAccent: string;
 };
 
-export const lightColors: AppColors = { ...baseColors };
+export const lightColors: AppColors = {
+  ...baseColors,
+  heroFrom: '#00403B',
+  heroTo: '#00685F',
+  accent: '#008378',
+  accentSoft: '#D1FAE5',
+  onAccent: '#FFFFFF',
+};
 
 export const darkColors: AppColors = {
   cream: softDark.surface,
@@ -412,8 +427,108 @@ export const darkColors: AppColors = {
   tertiary: softDark.tertiary,
   tertiaryFixed: softDark.tertiaryFixed,
   outline: softDark.outline,
+  heroFrom: '#00403B',
+  heroTo: '#00685F',
+  accent: '#008378',
+  accentSoft: '#00403B',
+  onAccent: '#FFFFFF',
 };
 
-export function colorsForScheme(scheme: ColorScheme | undefined | null): AppColors {
+/**
+ * Paletas por perfil:
+ *  - teal   → Soloist Modern (persona_natural, trabajador, cliente)
+ *  - indigo → Modern Editorial Multi-Theme Engine (admin del negocio / empresa)
+ */
+export type PaletteId = 'teal' | 'indigo';
+
+/** Stitch assets/24b81c80… (Modern Editorial): primary #2A14B4, container #4338CA, surface #FAF8FF… */
+export const indigoLight: AppColors = {
+  ...lightColors,
+  cream: '#FAF8FF',
+  creamDeep: '#EAEDFF',
+  white: '#FFFFFF',
+  text: '#131B2E',
+  textMuted: '#464554',
+  border: '#6B6A7C',
+  success: '#047857',
+  primary: '#2A14B4',
+  primaryText: '#2A14B4',
+  placeholder: '#5F5E70',
+  charcoal: '#131B2E',
+  surface: '#FAF8FF',
+  onSurface: '#131B2E',
+  onSurfaceVariant: '#464554',
+  surfaceContainerLowest: '#FFFFFF',
+  surfaceContainerLow: '#F2F3FF',
+  surfaceContainer: '#EAEDFF',
+  surfaceContainerHigh: '#E2E7FF',
+  primaryContainer: '#4338CA',
+  primaryFixed: '#E3DFFF',
+  secondary: '#006A61',
+  secondaryContainer: '#86F2E4',
+  tertiary: '#047857',
+  tertiaryFixed: '#E6F6EF',
+  outline: '#6B6A7C',
+  heroFrom: '#1B0C7A',
+  heroTo: '#4338CA',
+  accent: '#006A61',
+  accentSoft: '#86F2E4',
+  onAccent: '#FFFFFF',
+};
+
+export const indigoDark: AppColors = {
+  ...darkColors,
+  cream: '#0F1226',
+  creamDeep: '#232A4D',
+  white: '#161A33',
+  text: '#E6E8FF',
+  textMuted: '#C3C5DC',
+  border: '#9A9BB8',
+  success: '#4ADE80',
+  primary: '#4338CA',
+  primaryText: '#C3C0FF',
+  placeholder: '#A3A5C0',
+  charcoal: '#E6E8FF',
+  surface: '#0F1226',
+  onSurface: '#E6E8FF',
+  onSurfaceVariant: '#C3C5DC',
+  surfaceContainerLowest: '#161A33',
+  surfaceContainerLow: '#1B2040',
+  surfaceContainer: '#232A4D',
+  surfaceContainerHigh: '#2C3560',
+  primaryContainer: '#2A14B4',
+  primaryFixed: '#2A2670',
+  secondary: '#6BD8CB',
+  secondaryContainer: '#00504A',
+  tertiary: '#4ADE80',
+  tertiaryFixed: '#0E3B2B',
+  outline: '#9A9BB8',
+  heroFrom: '#1B0C7A',
+  heroTo: '#4338CA',
+  accent: '#6BD8CB',
+  accentSoft: '#00504A',
+  onAccent: '#00201D',
+};
+
+export function colorsForScheme(
+  scheme: ColorScheme | undefined | null,
+  palette: PaletteId = 'teal'
+): AppColors {
+  if (palette === 'indigo') return scheme === 'dark' ? indigoDark : indigoLight;
   return scheme === 'dark' ? darkColors : lightColors;
+}
+
+/** Tokens de tema (botones, tabs, gradientes) según paleta del perfil. */
+export function themeForPalette(t: ThemeTokens, palette: PaletteId): ThemeTokens {
+  if (palette !== 'indigo') return t;
+  return {
+    ...t,
+    primary: '#2A14B4',
+    primarySoft: '#4338CA',
+    accent: '#006A61',
+    tabActive: '#2A14B4',
+    surfaceTint: '#E3DFFF',
+    gradient: ['#2A14B4', '#4338CA'],
+    heroGradient: ['#1B0C7A', '#4338CA'],
+  };
 }

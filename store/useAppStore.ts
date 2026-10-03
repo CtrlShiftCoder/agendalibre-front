@@ -132,6 +132,9 @@ interface AppState {
   gallery: GalleryItem[];
   /** Local mock seña status by appointment id — no payment API */
   depositStatuses: Record<string, DepositStatus>;
+  /** Preferencias/ajustes mock persistentes (toggles, permisos, propuestas…). */
+  prefs: Record<string, unknown>;
+  setPref: (key: string, value: unknown) => void;
 
   setHydrated: (v: boolean) => void;
   setAppearance: (mode: AppearanceMode) => void;
@@ -396,6 +399,8 @@ export const useAppStore = create<AppState>()(
       reviews: [],
       gallery: [],
       depositStatuses: {},
+      prefs: {},
+      setPref: (key, value) => set((s) => ({ prefs: { ...s.prefs, [key]: value } })),
 
       setHydrated: (v) => set({ hydrated: v }),
 
@@ -1372,3 +1377,10 @@ export const useAppStore = create<AppState>()(
 );
 
 export { getActiveProfessional, isEmpresaAdmin };
+
+/** Lee una preferencia persistida con valor por defecto. */
+export function usePref<T>(key: string, fallback: T): [T, (v: T) => void] {
+  const raw = useAppStore((s) => s.prefs?.[key]);
+  const setPref = useAppStore((s) => s.setPref);
+  return [(raw === undefined ? fallback : (raw as T)), (v: T) => setPref(key, v)];
+}

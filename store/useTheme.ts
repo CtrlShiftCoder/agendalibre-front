@@ -1,5 +1,8 @@
+import { isEmpresaAdmin } from '@/lib/team';
 import {
   colorsForScheme,
+  themeForPalette,
+  type PaletteId,
   resolveThemeId,
   themes,
   type AppColors,
@@ -10,9 +13,20 @@ import { useAppStore } from './useAppStore';
 
 export { resolveThemeId };
 
+/** empresa (admin) → indigo; persona_natural / trabajador / cliente → teal (Soloist). */
+export function usePaletteId(): PaletteId {
+  const profile = useAppStore((s) => s.profile);
+  const professionals = useAppStore((s) => s.professionals);
+  if (profile?.role === 'empresa' && isEmpresaAdmin({ profile, professionals })) {
+    return 'indigo';
+  }
+  return 'teal';
+}
+
 export function useThemeTokens(): ThemeTokens {
   const raw = useAppStore((s) => s.profile?.theme);
-  return themes[resolveThemeId(raw)] ?? themes.neutral;
+  const palette = usePaletteId();
+  return themeForPalette(themes[resolveThemeId(raw)] ?? themes.neutral, palette);
 }
 
 export function resolveColorScheme(profile: {
@@ -41,7 +55,8 @@ export function useColorScheme(): ColorScheme {
 /** Cream / surface / text tokens for light or soft-dark. */
 export function useColors(): AppColors {
   const scheme = useColorScheme();
-  return colorsForScheme(scheme);
+  const palette = usePaletteId();
+  return colorsForScheme(scheme, palette);
 }
 
 /** @deprecated alias — prefer useColors() */

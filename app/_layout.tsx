@@ -1,3 +1,4 @@
+import { ToastHost } from '@/components/ui/Toast';
 import {
   PlusJakartaSans_400Regular,
   PlusJakartaSans_500Medium,
@@ -204,6 +205,7 @@ export default function RootLayout() {
           options={{ presentation: 'card', animation: 'slide_from_right' }}
         />
         </Stack>
+        <ToastHost />
       </ErrorBoundary>
     </GestureHandlerRootView>
   );
